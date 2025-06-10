@@ -214,6 +214,9 @@ export default function TicketingForm() {
     dispatch(updateChildForm({ index, data }))
   }
 
+  const adultTickets = Number(formData.adultTickets) || 0
+  const childTickets = Number(formData.childTickets) || 0
+
   return (
     <div className="space-y-6">
       {/* Progress Header */}

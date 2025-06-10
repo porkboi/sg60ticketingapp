@@ -81,11 +81,13 @@ const initialChildForm = {
   graduationYear: "",
 };
 
-const initialState: FormState = {
+const initialState = {
   currentStep: 1,
   formData: {
     ...initialAdultForm,
     ...initialChildForm,
+    adultTickets: 1,
+    childTickets: 0,
   },
   schema: {},
   adultForms: [initialAdultForm],
@@ -271,6 +273,14 @@ const formSlice = createSlice({
 
       if (field === "jobFunction" && value !== "Others") {
         state.formData.otherJobFunction = ""
+      }
+
+      if (field === "adultTickets" || field === "childTickets") {
+        state[field] = Number(value);
+        // Calculate total cost
+        const totalCost = state.formData.adultTickets * 50 + state.formData.childTickets * 25
+        state.schema.totalCost = { type: "number", value: totalCost }
+        return;
       }
 
       state.schema = buildSchema(state.formData)
