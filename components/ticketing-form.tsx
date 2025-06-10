@@ -29,10 +29,10 @@ export default function TicketingForm() {
   const isAdult = (idx: number) => idx < adultTickets
   const isChild = (idx: number) => idx >= adultTickets
 
-  // Render bubbles for each person
+  // Render bubbles for each person (adults and children)
   const renderBubbles = () => (
     <div className="flex justify-center gap-4 mb-6">
-      {Array.from({ length: totalPeople }).map((_, idx) => (
+      {Array.from({ length: adultTickets + childTickets }).map((_, idx) => (
         <button
           key={idx}
           type="button"
@@ -107,9 +107,9 @@ export default function TicketingForm() {
           index={currentPersonIndex}
           formData={formData.adultForms?.[currentPersonIndex] || {}}
           onChange={(data) => dispatch(updateAdultForm({ index: currentPersonIndex, data }))}
-          onNext={() => setCurrentPersonIndex((i) => Math.min(i + 1, totalPeople - 1))}
+          onNext={() => setCurrentPersonIndex((i) => Math.min(i + 1, adultTickets + childTickets - 1))}
           onPrev={() => setCurrentPersonIndex((i) => Math.max(i - 1, 0))}
-          isLast={currentPersonIndex === totalPeople - 1}
+          isLast={currentPersonIndex === adultTickets + childTickets - 1}
         />
       )
     } else {
