@@ -217,10 +217,10 @@ const formSlice = createSlice({
     },
     updateField: (state, action) => {
       const { field, value } = action.payload;
+      // If updating ticket numbers, update both formData and arrays
       if (field === "adultTickets") {
+        state.formData.adultTickets = value;
         const newCount = Number(value);
-        state.adultTickets = newCount;
-        // Adjust adultForms array
         while (state.adultForms.length < newCount) {
           state.adultForms.push({ ...initialAdultForm });
         }
@@ -230,9 +230,8 @@ const formSlice = createSlice({
         return;
       }
       if (field === "childTickets") {
+        state.formData.childTickets = value;
         const newCount = Number(value);
-        state.childTickets = newCount;
-        // Adjust childForms array
         while (state.childForms.length < newCount) {
           state.childForms.push({ ...initialChildForm });
         }
@@ -241,7 +240,8 @@ const formSlice = createSlice({
         }
         return;
       }
-      state[field] = value;
+      // Default: update formData
+      state.formData[field] = value;
     },
     updateAdultForm: (state, action) => {
       const { index, data } = action.payload;
