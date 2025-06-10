@@ -1213,7 +1213,7 @@ export default function TicketingForm({}: Props) {
       </Card>
 
       {/* After Ticket Selection - Adult and Child Registration Forms */}
-      {formData.discount && (
+      {formData.proceedToRegistration && formData.discount && (
         <div className="my-8">
           {renderBubbles()}
           {renderConsolidatedForm()}
@@ -1221,7 +1221,7 @@ export default function TicketingForm({}: Props) {
       )}
 
       {/* Registrant Information */}
-      {!formData.discount && (
+      {formData.proceedToRegistration && !formData.discount && (
         <div className="my-8">
           {renderBubbles()}
           <Card className="mt-8">
