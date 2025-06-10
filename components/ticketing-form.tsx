@@ -2,7 +2,7 @@
 
 import { useSelector, useDispatch } from "react-redux"
 import type { RootState } from "@/lib/store"
-import { updateField, resetForm } from "@/lib/features/form-slice"
+import { updateField, resetForm, updateAdultForm, updateChildForm } from "@/lib/features/form-slice"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -12,10 +12,14 @@ import { Checkbox } from "@/components/ui/checkbox"
 import { Badge } from "@/components/ui/badge"
 import { CheckCircle, Circle, Plus, Minus, Ticket } from "lucide-react"
 import { cn } from "@/lib/utils"
+import AdultRegistrationForm from "./AdultRegistrationForm"
+import ChildRegistrationForm from "./ChildRegistrationForm"
+import { useState } from "react"
 
 export default function TicketingForm() {
   const dispatch = useDispatch()
   const { formData, schema } = useSelector((state: RootState) => state.form)
+  const [currentAdultIndex, setCurrentAdultIndex] = useState(0)
 
   const handleFieldUpdate = (field: string, value: any) => {
     dispatch(updateField({ field, value }))
@@ -203,6 +207,13 @@ export default function TicketingForm() {
     return total
   }
 
+  const handleAdultFormChange = (index: number, data: any) => {
+    dispatch(updateAdultForm({ index, data }))
+  }
+  const handleChildFormChange = (index: number, data: any) => {
+    dispatch(updateChildForm({ index, data }))
+  }
+
   return (
     <div className="space-y-6">
       {/* Progress Header */}
@@ -347,6 +358,18 @@ export default function TicketingForm() {
                   ✓ Tickets selected - Continue with registration below
                 </div>
               )}
+
+              {/* Discount Checkbox */}
+              <div className="flex items-center gap-2 mt-4">
+                <Checkbox
+                  id="discount"
+                  checked={formData.discount || false}
+                  onCheckedChange={(checked) => handleFieldUpdate("discount", checked)}
+                />
+                <Label htmlFor="discount" className="text-sm">
+                  Fill in my personal information for a 50% discount
+                </Label>
+              </div>
             </div>
           </div>
         </CardContent>
@@ -1099,6 +1122,91 @@ export default function TicketingForm() {
                 Start Over
               </Button>
             </div>
+          </CardContent>
+        </Card>
+      )}
+
+      {/* After Ticket Selection - Adult and Child Registration Forms */}
+      {formData.proceedToRegistration && formData.discount && (
+        <div className="my-8">
+          {/* Bubble Progress Bar */}
+          <div className="flex justify-center gap-4 mb-6">
+            {Array.from({ length: formData.adultTickets }).map((_, idx) => (
+              <div
+                key={idx}
+                className={cn(
+                  "w-8 h-8 rounded-full flex items-center justify-center border-2",
+                  idx === currentAdultIndex
+                    ? "bg-blue-600 text-white border-blue-600"
+                    : "bg-white text-blue-600 border-blue-300"
+                )}
+              >
+                {idx + 1}
+              </div>
+            ))}
+          </div>
+
+          {/* Render a form for the current adult */}
+          <AdultRegistrationForm
+            index={currentAdultIndex}
+            formData={formData.adultForms[currentAdultIndex]}
+            onChange={(data) => handleAdultFormChange(currentAdultIndex, data)}
+            onNext={() => setCurrentAdultIndex((i) => i + 1)}
+            onPrev={() => setCurrentAdultIndex((i) => i - 1)}
+            isLast={currentAdultIndex === formData.adultTickets - 1}
+          />
+
+          {/* Render child forms (autofilled as Student) */}
+          {formData.childTickets > 0 && (
+            <div className="mt-8">
+              <h3 className="text-lg font-semibold mb-2">Children</h3>
+              {Array.from({ length: formData.childTickets }).map((_, idx) => (
+                <ChildRegistrationForm
+                  key={idx}
+                  index={idx}
+                  formData={{
+                    ...formData.childForms[idx],
+                    occupation: "Student",
+                  }}
+                  onChange={(data) => handleChildFormChange(idx, data)}
+                />
+              ))}
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* After Ticket Selection - Registrant Information (for non-discounted registrations) */}
+      {formData.proceedToRegistration && !formData.discount && (
+        <Card className="mt-8">
+          <CardHeader>
+            <CardTitle>Registrant Information</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <Input
+              id="firstName"
+              value={formData.firstName}
+              onChange={(e) => handleFieldUpdate("firstName", e.target.value)}
+              placeholder="First Name"
+            />
+            <Input
+              id="lastName"
+              value={formData.lastName}
+              onChange={(e) => handleFieldUpdate("lastName", e.target.value)}
+              placeholder="Last Name"
+            />
+            <Input
+              id="email"
+              value={formData.email}
+              onChange={(e) => handleFieldUpdate("email", e.target.value)}
+              placeholder="Email Address"
+            />
+            <Input
+              id="contactNumber"
+              value={formData.contactNumber}
+              onChange={(e) => handleFieldUpdate("contactNumber", e.target.value)}
+              placeholder="Contact Number"
+            />
           </CardContent>
         </Card>
       )}
