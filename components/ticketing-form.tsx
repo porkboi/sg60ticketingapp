@@ -1204,7 +1204,7 @@ export default function TicketingForm({}: Props) {
                   onCheckedChange={handleCheckedChange("discount")}
                 />
                 <Label htmlFor="discount" className="text-sm">
-                  Do not fill in my personal information for a 50% discount
+                  Fill in my personal information for a 50% discount
                 </Label>
               </div>
             </div>
