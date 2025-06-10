@@ -90,7 +90,7 @@ const initialState = {
     childTickets: 0,
   },
   schema: {},
-  adultForms: [{}], // at least one object for the default ticket
+  adultForms: [{ ...initialAdultForm }], // at least one object for the default ticket
   childForms: [],
 }
 
