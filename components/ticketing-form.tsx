@@ -1,134 +1,83 @@
 "use client"
 
+import { type ChangeEvent, useState } from "react"
+import { CheckCircle, Circle, Plus, Minus, Ticket } from "lucide-react"
 import { useSelector, useDispatch } from "react-redux"
-import type { RootState } from "@/lib/store"
-import { updateField, resetForm, updateAdultForm, updateChildForm } from "@/lib/features/form-slice"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import type { ButtonProps } from "@/components/ui/button"
 import { Button } from "@/components/ui/button"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
-import { Checkbox } from "@/components/ui/checkbox"
 import { Badge } from "@/components/ui/badge"
-import { CheckCircle, Circle, Plus, Minus, Ticket } from "lucide-react"
+import { Checkbox } from "@/components/ui/checkbox"
 import { cn } from "@/lib/utils"
+import { RootState } from "@/lib/store"
+import { updateField, updateAdultForm, updateChildForm, resetForm } from "@/lib/features/form-slice"
 import AdultRegistrationForm from "./AdultRegistrationForm"
 import ChildRegistrationForm from "./ChildRegistrationForm"
-import { useState } from "react"
 
-export default function TicketingForm() {
+interface FormState {
+  currentStep: number
+  formData: FormData
+  schema: Record<string, any>
+  adultForms: FormData[]
+  childForms: FormData[]
+}
+
+export interface FormData {
+  adultTickets: number
+  childTickets: number
+  proceedToRegistration: boolean
+  acknowledgedIntro: boolean
+  salutation: string
+  firstName: string
+  lastName: string
+  email: string
+  nationality: string
+  otherNationality: string
+  isPermanentResident: boolean | null
+  countryOfResidence: string
+  otherCountryResidence: string
+  stateOfResidence: string
+  cityOfResidence: string
+  occupation: string
+  otherOccupation: string
+  school: string
+  qualification: string
+  otherQualification: string
+  courseOfStudy: string
+  otherCourseOfStudy: string
+  graduationYear: string
+  industry: string
+  otherIndustry: string
+  financialSector: string
+  jobFunction: string
+  otherJobFunction: string
+  contactNumber: string
+  discount?: boolean
+}
+
+interface Props {}
+
+export default function TicketingForm({}: Props) {
   const dispatch = useDispatch()
-  const { formData } = useSelector((state: RootState) => state.form)
+  const { formData } = useSelector((state: RootState) => state.form) as FormState
   const [currentPersonIndex, setCurrentPersonIndex] = useState(0)
 
   const adultTickets = Number(formData.adultTickets) || 0
   const childTickets = Number(formData.childTickets) || 0
-  const totalPeople = adultTickets + childTickets
 
-  // Helper to determine if current bubble is adult or child
-  const isAdult = (idx: number) => idx < adultTickets
-  const isChild = (idx: number) => idx >= adultTickets
-
-  // Render bubbles for each person (adults and children)
-  const renderBubbles = () => (
-    <div className="flex justify-center gap-4 mb-6">
-      {Array.from({ length: adultTickets + childTickets }).map((_, idx) => (
-        <button
-          key={idx}
-          type="button"
-          onClick={() => setCurrentPersonIndex(idx)}
-          className={cn(
-            "w-8 h-8 rounded-full flex items-center justify-center border-2 transition-all",
-            idx === currentPersonIndex
-              ? "bg-blue-600 text-white border-blue-600 scale-110"
-              : isAdult(idx)
-                ? "bg-white text-blue-600 border-blue-300"
-                : "bg-white text-green-600 border-green-300"
-          )}
-          title={isAdult(idx) ? `Adult ${idx + 1}` : `Child ${idx - adultTickets + 1}`}
-        >
-          {isAdult(idx) ? idx + 1 : String.fromCharCode(65 + (idx - adultTickets))}
-        </button>
-      ))}
-    </div>
-  )
-
-  // Render the correct form for the current person
-  const renderPersonForm = () => {
-    if (!formData.discount) {
-      // Simple form for registrant only
-      if (currentPersonIndex === 0) {
-        return (
-          <Card className="mt-8">
-            <CardHeader>
-              <CardTitle>Registrant Information</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <Input
-                id="firstName"
-                value={formData.firstName}
-                onChange={(e) => dispatch(updateField({ field: "firstName", value: e.target.value }))}
-                placeholder="First Name"
-              />
-              <Input
-                id="lastName"
-                value={formData.lastName}
-                onChange={(e) => dispatch(updateField({ field: "lastName", value: e.target.value }))}
-                placeholder="Last Name"
-              />
-              <Input
-                id="email"
-                value={formData.email}
-                onChange={(e) => dispatch(updateField({ field: "email", value: e.target.value }))}
-                placeholder="Email Address"
-              />
-              <Input
-                id="contactNumber"
-                value={formData.contactNumber}
-                onChange={(e) => dispatch(updateField({ field: "contactNumber", value: e.target.value }))}
-                placeholder="Contact Number"
-              />
-            </CardContent>
-          </Card>
-        )
-      }
-      // For other bubbles, show a message
-      return (
-        <div className="text-center text-gray-500 mt-8">
-          Only the registrant's information is required for standard tickets.
-        </div>
-      )
-    }
-
-    // Discount checked: show full forms for adults, student forms for children
-    if (isAdult(currentPersonIndex)) {
-      return (
-        <AdultRegistrationForm
-          index={currentPersonIndex}
-          formData={formData.adultForms?.[currentPersonIndex] || {}}
-          onChange={(data) => dispatch(updateAdultForm({ index: currentPersonIndex, data }))}
-          onNext={() => setCurrentPersonIndex((i) => Math.min(i + 1, adultTickets + childTickets - 1))}
-          onPrev={() => setCurrentPersonIndex((i) => Math.max(i - 1, 0))}
-          isLast={currentPersonIndex === adultTickets + childTickets - 1}
-        />
-      )
-    } else {
-      const childIdx = currentPersonIndex - adultTickets
-      return (
-        <ChildRegistrationForm
-          index={childIdx}
-          formData={{
-            ...formData.childForms?.[childIdx],
-            occupation: "Student",
-          }}
-          onChange={(data) => dispatch(updateChildForm({ index: childIdx, data }))}
-        />
-      )
-    }
+  const handleFieldUpdate = (field: keyof FormData, value: unknown) => {
+    dispatch(updateField({ field, value }))
   }
 
-  const handleFieldUpdate = (field: string, value: any) => {
-    dispatch(updateField({ field, value }))
+  const handleRadioChange = (value: string, field: keyof FormData) => {
+    handleFieldUpdate(field, value)
+  }
+
+  const handleCheckboxChange = (checked: boolean, field: keyof FormData) => {
+    handleFieldUpdate(field, checked)
   }
 
   const handleTicketChange = (type: "adult" | "child", increment: boolean) => {
@@ -313,11 +262,101 @@ export default function TicketingForm() {
     return total
   }
 
-  const handleAdultFormChange = (index: number, data: any) => {
-    dispatch(updateAdultForm({ index, data }))
-  }
-  const handleChildFormChange = (index: number, data: any) => {
-    dispatch(updateChildForm({ index, data }))
+  const renderBubbles = () => (
+    <div className="flex justify-center gap-4 mb-6">
+      {Array.from({ length: adultTickets + childTickets }).map((_, idx) => (
+        <button
+          key={idx}
+          type="button"
+          onClick={() => setCurrentPersonIndex(idx)}
+          className={cn(
+            "w-8 h-8 rounded-full flex items-center justify-center border-2 transition-all",
+            idx === currentPersonIndex
+              ? "bg-blue-600 text-white border-blue-600 scale-110"
+              : idx < adultTickets
+                ? "bg-white text-blue-600 border-blue-300"
+                : "bg-white text-green-600 border-green-300"
+          )}
+          title={idx < adultTickets ? `Adult ${idx + 1}` : `Child ${idx - adultTickets + 1}`}
+        >
+          {idx < adultTickets ? idx + 1 : String.fromCharCode(65 + (idx - adultTickets))}
+        </button>
+      ))}
+    </div>
+  )
+
+  // Render the correct form for the current person
+  const renderPersonForm = () => {
+    if (!formData.discount) {
+      // Simple form for registrant only
+      if (currentPersonIndex === 0) {
+        return (
+          <Card className="mt-8">
+            <CardHeader>
+              <CardTitle>Registrant Information</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <Input
+                id="firstName"
+                value={formData.firstName}
+                onChange={(e) => dispatch(updateField({ field: "firstName", value: e.target.value }))}
+                placeholder="First Name"
+              />
+              <Input
+                id="lastName"
+                value={formData.lastName}
+                onChange={(e) => dispatch(updateField({ field: "lastName", value: e.target.value }))}
+                placeholder="Last Name"
+              />
+              <Input
+                id="email"
+                value={formData.email}
+                onChange={(e) => dispatch(updateField({ field: "email", value: e.target.value }))}
+                placeholder="Email Address"
+              />
+              <Input
+                id="contactNumber"
+                value={formData.contactNumber}
+                onChange={(e) => dispatch(updateField({ field: "contactNumber", value: e.target.value }))}
+                placeholder="Contact Number"
+              />
+            </CardContent>
+          </Card>
+        )
+      }
+      // For other bubbles, show a message
+      return (
+        <div className="text-center text-gray-500 mt-8">
+          Only the registrant's information is required for standard tickets.
+        </div>
+      )
+    }
+
+    // Discount checked: show full forms for adults, student forms for children
+    if (idx < adultTickets) {
+      return (
+        <AdultRegistrationForm
+          index={currentPersonIndex}
+          formData={formData.adultForms?.[currentPersonIndex] || {}}
+          onChange={(data) => dispatch(updateAdultForm({ index: currentPersonIndex, data }))}
+          onNext={() => setCurrentPersonIndex((i) => Math.min(i + 1, adultTickets + childTickets - 1))}
+          onPrev={() => setCurrentPersonIndex((i) => Math.max(i - 1, 0))}
+          isLast={currentPersonIndex === adultTickets + childTickets - 1}
+        />
+      )
+    } else {
+      const childIdx = currentPersonIndex - adultTickets
+      return (
+        <ChildRegistrationForm
+          index={childIdx}
+          formData={{
+            ...formData.childForms?.[childIdx],
+            occupation: "Student",
+          }}
+          onChange={(data) => dispatch(updateChildForm({ index: childIdx, data }))}
+        />
+      )
+    }
   }
 
   const renderConsolidatedForm = () => (
@@ -1073,7 +1112,7 @@ export default function TicketingForm() {
             <CardTitle className="text-lg">
               {formData.proceedToRegistration ? "Registration Progress" : "Ticket Selection"}
             </CardTitle>
-            <Badge variant="secondary" className="bg-blue-100 text-blue-800">
+            <Badge className="bg-blue-100 text-blue-800">
               {getCompletedSteps()} / {getTotalSteps()} Complete
             </Badge>
           </div>
@@ -1105,9 +1144,7 @@ export default function TicketingForm() {
           <div className="space-y-6">
             <div className="text-center space-y-2">
               <h3 className="text-lg font-semibold text-gray-900">Select Your Tickets</h3>
-              <p className="text-gray-600">
-                Choose the number of tickets you'd like to purchase for the SG:60 Legacy event
-              </p>
+              <p className="text-gray-600">Choose the number of tickets you'd like to purchase for the SG:60 Legacy event</p>
             </div>
 
             <div className="grid md:grid-cols-2 gap-6">
@@ -1120,11 +1157,9 @@ export default function TicketingForm() {
                 </div>
                 <div className="flex items-center justify-center gap-4">
                   <Button
-                    variant="outline"
-                    size="sm"
+                    className="h-10 w-10 p-0"
                     onClick={() => handleTicketChange("adult", false)}
                     disabled={formData.adultTickets <= 0}
-                    className="h-10 w-10 p-0"
                   >
                     <Minus className="w-4 h-4" />
                   </Button>
@@ -1132,12 +1167,7 @@ export default function TicketingForm() {
                     <div className="text-2xl font-bold text-blue-900">{formData.adultTickets}</div>
                     <div className="text-xs text-blue-600">tickets</div>
                   </div>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => handleTicketChange("adult", true)}
-                    className="h-10 w-10 p-0"
-                  >
+                  <Button className="h-10 w-10 p-0" onClick={() => handleTicketChange("adult", true)}>
                     <Plus className="w-4 h-4" />
                   </Button>
                 </div>
@@ -1155,11 +1185,9 @@ export default function TicketingForm() {
                 </div>
                 <div className="flex items-center justify-center gap-4">
                   <Button
-                    variant="outline"
-                    size="sm"
+                    className="h-10 w-10 p-0"
                     onClick={() => handleTicketChange("child", false)}
                     disabled={formData.childTickets <= 0}
-                    className="h-10 w-10 p-0"
                   >
                     <Minus className="w-4 h-4" />
                   </Button>
@@ -1167,12 +1195,7 @@ export default function TicketingForm() {
                     <div className="text-2xl font-bold text-green-900">{formData.childTickets}</div>
                     <div className="text-xs text-green-600">tickets</div>
                   </div>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => handleTicketChange("child", true)}
-                    className="h-10 w-10 p-0"
-                  >
+                  <Button className="h-10 w-10 p-0" onClick={() => handleTicketChange("child", true)}>
                     <Plus className="w-4 h-4" />
                   </Button>
                 </div>
@@ -1222,55 +1245,18 @@ export default function TicketingForm() {
               </div>
             </div>
           </div>
-        </Card>
+        </CardContent>
+      </Card>
 
       {/* After Ticket Selection - Adult and Child Registration Forms */}
       {formData.proceedToRegistration && formData.discount && (
         <div className="my-8">
-          {/* Bubble Progress Bar for all people */}
-          <div className="flex justify-center gap-4 mb-6">
-            {Array.from({ length: adultTickets + childTickets }).map((_, idx) => (
-              <button
-                key={idx}
-                type="button"
-                onClick={() => setCurrentPersonIndex(idx)}
-                className={cn(
-                  "w-8 h-8 rounded-full flex items-center justify-center border-2",
-                  idx === currentPersonIndex
-                    ? "bg-blue-600 text-white border-blue-600"
-                    : "bg-white text-blue-600 border-blue-300"
-                )}
-                title={idx < adultTickets ? `Adult ${idx + 1}` : `Child ${idx - adultTickets + 1}`}
-              >
-                {idx < adultTickets ? idx + 1 : String.fromCharCode(65 + (idx - adultTickets))}
-              </button>
-            ))}
-          </div>
-
-          {/* Render the correct form for the current person */}
-          {currentPersonIndex < adultTickets ? (
-            <AdultRegistrationForm
-              index={currentPersonIndex}
-              formData={formData.adultForms?.[currentPersonIndex] || {}}
-              onChange={(data) => handleAdultFormChange(currentPersonIndex, data)}
-              onNext={() => setCurrentPersonIndex((i) => Math.min(i + 1, adultTickets + childTickets - 1))}
-              onPrev={() => setCurrentPersonIndex((i) => Math.max(i - 1, 0))}
-              isLast={currentPersonIndex === adultTickets + childTickets - 1}
-            />
-          ) : (
-            <ChildRegistrationForm
-              index={currentPersonIndex - adultTickets}
-              formData={{
-                ...formData.childForms?.[currentPersonIndex - adultTickets],
-                occupation: "Student",
-              }}
-              onChange={(data) => handleChildFormChange(currentPersonIndex - adultTickets, data)}
-            />
-          )}
+          {renderBubbles()}
+          {renderPersonForm()}
         </div>
       )}
 
-      {/* After Ticket Selection - Registrant Information (for non-discounted registrations) */}
+      {/* Registrant Information */}
       {formData.proceedToRegistration && !formData.discount && (
         <Card className="mt-8">
           <CardHeader>
@@ -1280,32 +1266,33 @@ export default function TicketingForm() {
             <Input
               id="firstName"
               value={formData.firstName}
-              onChange={(e) => handleFieldUpdate("firstName", e.target.value)}
+              onChange={(e: ChangeEvent<HTMLInputElement>) => handleFieldUpdate("firstName", e.target.value)}
               placeholder="First Name"
             />
             <Input
               id="lastName"
               value={formData.lastName}
-              onChange={(e) => handleFieldUpdate("lastName", e.target.value)}
+              onChange={(e: ChangeEvent<HTMLInputElement>) => handleFieldUpdate("lastName", e.target.value)}
               placeholder="Last Name"
             />
             <Input
               id="email"
               value={formData.email}
-              onChange={(e) => handleFieldUpdate("email", e.target.value)}
+              onChange={(e: ChangeEvent<HTMLInputElement>) => handleFieldUpdate("email", e.target.value)}
               placeholder="Email Address"
             />
             <Input
               id="contactNumber"
               value={formData.contactNumber}
-              onChange={(e) => handleFieldUpdate("contactNumber", e.target.value)}
+              onChange={(e: ChangeEvent<HTMLInputElement>) => handleFieldUpdate("contactNumber", e.target.value)}
               placeholder="Contact Number"
             />
           </CardContent>
         </Card>
       )}
 
-      {renderConsolidatedForm()}
+      {/* Consolidated Form - only show when registration has proceeded */}
+      {formData.proceedToRegistration && renderConsolidatedForm()}
     </div>
   )
 }
