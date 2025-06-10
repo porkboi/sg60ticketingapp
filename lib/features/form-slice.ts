@@ -90,8 +90,8 @@ const initialState = {
     childTickets: 0,
   },
   schema: {},
-  adultForms: [initialAdultForm],
-  childForms: [initialChildForm],
+  adultForms: [{}], // at least one object for the default ticket
+  childForms: [],
 }
 
 const buildSchema = (formData: FormData) => {
@@ -215,75 +215,33 @@ const formSlice = createSlice({
     prevStep: (state) => {
       state.currentStep = Math.max(1, state.currentStep - 1)
     },
-    updateField: (state, action: PayloadAction<{ field: string; value: any }>) => {
-      const { field, value } = action.payload
-      ;(state.formData as any)[field] = value
-
-      // Clear dependent fields when parent changes
-      if (field === "nationality" && value !== "Others") {
-        state.formData.otherNationality = ""
-        state.formData.isPermanentResident = null
-      }
-
-      if (field === "countryOfResidence" && value !== "United States of America") {
-        state.formData.stateOfResidence = "California"
-        state.formData.cityOfResidence = "San Francisco"
-      }
-
-      if (field === "countryOfResidence" && value !== "Others") {
-        state.formData.otherCountryResidence = ""
-      }
-
-      if (field === "occupation" && value !== "Others") {
-        state.formData.otherOccupation = ""
-      }
-
-      if (field === "occupation" && value !== "Student") {
-        state.formData.school = ""
-        state.formData.qualification = ""
-        state.formData.otherQualification = ""
-        state.formData.courseOfStudy = ""
-        state.formData.otherCourseOfStudy = ""
-        state.formData.graduationYear = ""
-      }
-
-      if (field === "qualification" && value !== "Others") {
-        state.formData.otherQualification = ""
-      }
-
-      if (field === "courseOfStudy" && value !== "Others") {
-        state.formData.otherCourseOfStudy = ""
-      }
-
-      if (field === "occupation" && value !== "Working Professional" && value !== "Business Owner and Entrepreneur") {
-        state.formData.industry = ""
-        state.formData.otherIndustry = ""
-        state.formData.financialSector = ""
-        state.formData.jobFunction = ""
-        state.formData.otherJobFunction = ""
-      }
-
-      if (field === "industry" && value !== "Others") {
-        state.formData.otherIndustry = ""
-      }
-
-      if (field === "industry" && value !== "Banking and Finance") {
-        state.formData.financialSector = ""
-      }
-
-      if (field === "jobFunction" && value !== "Others") {
-        state.formData.otherJobFunction = ""
-      }
-
-      if (field === "adultTickets" || field === "childTickets") {
-        state[field] = Number(value);
-        // Calculate total cost
-        const totalCost = state.formData.adultTickets * 50 + state.formData.childTickets * 25
-        state.schema.totalCost = { type: "number", value: totalCost }
+    updateField: (state, action) => {
+      const { field, value } = action.payload;
+      if (field === "adultTickets") {
+        const newCount = Number(value);
+        state.adultTickets = newCount;
+        // Adjust adultForms array
+        while (state.adultForms.length < newCount) {
+          state.adultForms.push({ ...initialAdultForm });
+        }
+        while (state.adultForms.length > newCount) {
+          state.adultForms.pop();
+        }
         return;
       }
-
-      state.schema = buildSchema(state.formData)
+      if (field === "childTickets") {
+        const newCount = Number(value);
+        state.childTickets = newCount;
+        // Adjust childForms array
+        while (state.childForms.length < newCount) {
+          state.childForms.push({ ...initialChildForm });
+        }
+        while (state.childForms.length > newCount) {
+          state.childForms.pop();
+        }
+        return;
+      }
+      state[field] = value;
     },
     updateAdultForm: (state, action) => {
       const { index, data } = action.payload;

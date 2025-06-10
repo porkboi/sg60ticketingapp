@@ -1152,23 +1152,23 @@ export default function TicketingForm() {
           {/* Render a form for the current adult */}
           <AdultRegistrationForm
             index={currentAdultIndex}
-            formData={formData.adultForms[currentAdultIndex]}
+            formData={formData.adultForms?.[currentAdultIndex] || {}}
             onChange={(data) => handleAdultFormChange(currentAdultIndex, data)}
             onNext={() => setCurrentAdultIndex((i) => i + 1)}
             onPrev={() => setCurrentAdultIndex((i) => i - 1)}
-            isLast={currentAdultIndex === formData.adultTickets - 1}
+            isLast={currentAdultIndex === adultTickets - 1}
           />
 
           {/* Render child forms (autofilled as Student) */}
           {formData.childTickets > 0 && (
             <div className="mt-8">
               <h3 className="text-lg font-semibold mb-2">Children</h3>
-              {Array.from({ length: formData.childTickets }).map((_, idx) => (
+              {Array.from({ length: childTickets }).map((_, idx) => (
                 <ChildRegistrationForm
                   key={idx}
                   index={idx}
                   formData={{
-                    ...formData.childForms[idx],
+                    ...formData.childForms?.[idx],
                     occupation: "Student",
                   }}
                   onChange={(data) => handleChildFormChange(idx, data)}
