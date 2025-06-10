@@ -16,53 +16,18 @@ import { RootState } from "@/lib/store"
 import { updateField, updateAdultForm, updateChildForm, resetForm } from "@/lib/features/form-slice"
 import AdultRegistrationForm from "./AdultRegistrationForm"
 import ChildRegistrationForm from "./ChildRegistrationForm"
-
-interface FormState {
-  currentStep: number
-  formData: FormData
-  schema: Record<string, any>
-  adultForms: FormData[]
-  childForms: FormData[]
-}
-
-export interface FormData {
-  adultTickets: number
-  childTickets: number
-  proceedToRegistration: boolean
-  acknowledgedIntro: boolean
-  salutation: string
-  firstName: string
-  lastName: string
-  email: string
-  nationality: string
-  otherNationality: string
-  isPermanentResident: boolean | null
-  countryOfResidence: string
-  otherCountryResidence: string
-  stateOfResidence: string
-  cityOfResidence: string
-  occupation: string
-  otherOccupation: string
-  school: string
-  qualification: string
-  otherQualification: string
-  courseOfStudy: string
-  otherCourseOfStudy: string
-  graduationYear: string
-  industry: string
-  otherIndustry: string
-  financialSector: string
-  jobFunction: string
-  otherJobFunction: string
-  contactNumber: string
-  discount?: boolean
-}
+import type { FormState, FormData } from "@/lib/features/form-slice"
 
 interface Props {}
 
 export default function TicketingForm({}: Props) {
   const dispatch = useDispatch()
-  const { formData } = useSelector((state: RootState) => state.form) as FormState
+  const { formData, schema } = useSelector((state: RootState) => {
+    return {
+      formData: state.form.formData as FormData,
+      schema: state.form.schema
+    }
+  })
   const [currentPersonIndex, setCurrentPersonIndex] = useState(0)
 
   const adultTickets = Number(formData.adultTickets) || 0
@@ -71,7 +36,6 @@ export default function TicketingForm({}: Props) {
   const handleFieldUpdate = (field: keyof FormData, value: unknown) => {
     dispatch(updateField({ field, value }))
   }
-
   const handleRadioChange = (value: string, field: keyof FormData) => {
     handleFieldUpdate(field, value)
   }
@@ -84,6 +48,16 @@ export default function TicketingForm({}: Props) {
     const currentValue = type === "adult" ? formData.adultTickets : formData.childTickets
     const newValue = increment ? currentValue + 1 : Math.max(1, currentValue - 1)
     handleFieldUpdate(type === "adult" ? "adultTickets" : "childTickets", newValue)
+  }
+
+  // Add explicit type for onValueChange handlers
+  const handleValueChange = (field: keyof FormData) => (value: string) => {
+    handleFieldUpdate(field, value)
+  }
+
+  // Add explicit type for onCheckedChange handlers
+  const handleCheckedChange = (field: keyof FormData) => (checked: boolean) => {
+    handleFieldUpdate(field, checked)
   }
 
   const getTotalCost = () => {
@@ -323,17 +297,14 @@ export default function TicketingForm({}: Props) {
             </CardContent>
           </Card>
         )
-      }
-      // For other bubbles, show a message
+      }      // For other bubbles, show a message
       return (
         <div className="text-center text-gray-500 mt-8">
           Only the registrant's information is required for standard tickets.
         </div>
       )
-    }
-
-    // Discount checked: show full forms for adults, student forms for children
-    if (idx < adultTickets) {
+    }    // Discount checked: show full forms for adults, student forms for children
+    if (currentPersonIndex < adultTickets) {
       return (
         <AdultRegistrationForm
           index={currentPersonIndex}
@@ -429,7 +400,7 @@ export default function TicketingForm({}: Props) {
                 </div>
                 <RadioGroup
                   value={formData.salutation}
-                  onValueChange={(value) => handleFieldUpdate("salutation", value)}
+                  onValueChange={handleValueChange("salutation")}
                   className="grid grid-cols-5 gap-2"
                 >
                   {["Mr", "Mrs", "Ms", "Dr", "Prof"].map((option) => (
@@ -544,8 +515,7 @@ export default function TicketingForm({}: Props) {
                 <CardTitle>Nationality & Citizenship</CardTitle>
               </div>
             </CardHeader>
-            <CardContent className="space-y-4">
-              <RadioGroup value={formData.nationality} onValueChange={(value) => handleFieldUpdate("nationality", value)}>
+            <CardContent className="space-y-4">              <RadioGroup value={formData.nationality} onValueChange={handleValueChange("nationality")}>
                 <div className="flex items-center space-x-2">
                   <RadioGroupItem value="Singapore" id="singapore" />
                   <Label htmlFor="singapore">Singapore</Label>
@@ -585,7 +555,7 @@ export default function TicketingForm({}: Props) {
                     <Checkbox
                       id="isPR"
                       checked={formData.isPermanentResident || false}
-                      onCheckedChange={(checked) => handleFieldUpdate("isPermanentResident", checked)}
+                      onCheckedChange={handleCheckedChange("isPermanentResident")}
                     />
                     <Label htmlFor="isPR" className="text-sm">
                       Yes, I am a Singaporean Permanent Resident
@@ -617,7 +587,7 @@ export default function TicketingForm({}: Props) {
                 <Label className="font-medium">Country of Residence</Label>
                 <RadioGroup
                   value={formData.countryOfResidence}
-                  onValueChange={(value) => handleFieldUpdate("countryOfResidence", value)}
+                  onValueChange={handleValueChange("countryOfResidence")}
                 >
                   <div className="flex items-center space-x-2">
                     <RadioGroupItem value="United States of America" id="usa" />
@@ -721,7 +691,7 @@ export default function TicketingForm({}: Props) {
                 <Label className="font-medium">Occupation</Label>
                 <RadioGroup
                   value={formData.occupation}
-                  onValueChange={(value) => handleFieldUpdate("occupation", value)}
+                  onValueChange={handleValueChange("occupation")}
                   className="space-y-2"
                 >
                   {["Student", "Working Professional", "Business Owner and Entrepreneur", "Others"].map((option) => (
@@ -781,7 +751,7 @@ export default function TicketingForm({}: Props) {
                       </div>
                       <RadioGroup
                         value={formData.qualification}
-                        onValueChange={(value) => handleFieldUpdate("qualification", value)}
+                        onValueChange={handleValueChange("qualification")}
                         className="space-y-2"
                       >
                         {[
@@ -827,7 +797,7 @@ export default function TicketingForm({}: Props) {
                       </div>
                       <RadioGroup
                         value={formData.courseOfStudy}
-                        onValueChange={(value) => handleFieldUpdate("courseOfStudy", value)}
+                        onValueChange={handleValueChange("courseOfStudy")}
                         className="space-y-2 max-h-48 overflow-y-auto"
                       >
                         {[
@@ -915,7 +885,7 @@ export default function TicketingForm({}: Props) {
                     </div>
                     <RadioGroup
                       value={formData.industry}
-                      onValueChange={(value) => handleFieldUpdate("industry", value)}
+                      onValueChange={handleValueChange("industry")}
                       className="space-y-2 max-h-48 overflow-y-auto"
                     >
                       {[
@@ -973,7 +943,7 @@ export default function TicketingForm({}: Props) {
                       </div>
                       <RadioGroup
                         value={formData.financialSector}
-                        onValueChange={(value) => handleFieldUpdate("financialSector", value)}
+                        onValueChange={handleValueChange("financialSector")}
                         className="space-y-2"
                       >
                         {[
@@ -1009,7 +979,7 @@ export default function TicketingForm({}: Props) {
                       </div>
                       <RadioGroup
                         value={formData.jobFunction}
-                        onValueChange={(value) => handleFieldUpdate("jobFunction", value)}
+                        onValueChange={handleValueChange("jobFunction")}
                         className="space-y-2 max-h-48 overflow-y-auto"
                       >
                         {[
@@ -1076,21 +1046,17 @@ export default function TicketingForm({}: Props) {
               <CardContent className="space-y-4">
                 <p className="text-green-700">
                   Thank you for joining the Singapore Global Network! Your registration has been completed successfully.
-                </p>
-
-                <div className="bg-white p-4 rounded-lg border border-green-200">
-                  <h3 className="font-semibold mb-2 text-green-800">Generated Schema:</h3>
+                </p>                <div className="bg-white p-4 rounded-lg border border-green-200">
+                  <h3 className="font-semibold mb-2 text-green-800">Registration Data:</h3>
                   <pre className="text-xs text-left overflow-auto bg-gray-50 p-2 rounded text-gray-700">
-                    {JSON.stringify(schema, null, 2)}
+                    {JSON.stringify(formData, null, 2)}
                   </pre>
                 </div>
 
-                <div className="flex gap-2">
-                  <Button className="flex-1 bg-green-600 hover:bg-green-700">Submit Registration</Button>
+                <div className="flex gap-2">                  <Button className="flex-1 bg-green-600 hover:bg-green-700">Submit Registration</Button>
                   <Button
-                    variant="outline"
-                    onClick={() => dispatch(resetForm())}
                     className="border-green-300 text-green-700 hover:bg-green-50"
+                    onClick={() => dispatch(resetForm())}
                   >
                     Start Over
                   </Button>
@@ -1216,11 +1182,9 @@ export default function TicketingForm({}: Props) {
                 </div>
               </div>
 
-              {isStepComplete("tickets") && !formData.proceedToRegistration && (
-                <Button
+              {isStepComplete("tickets") && !formData.proceedToRegistration && (                <Button
                   onClick={() => handleFieldUpdate("proceedToRegistration", true)}
                   className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 transition-all duration-300 hover:scale-105"
-                  size="lg"
                 >
                   Proceed to Registration
                 </Button>
@@ -1237,7 +1201,7 @@ export default function TicketingForm({}: Props) {
                 <Checkbox
                   id="discount"
                   checked={formData.discount || false}
-                  onCheckedChange={(checked) => handleFieldUpdate("discount", checked)}
+                  onCheckedChange={handleCheckedChange("discount")}
                 />
                 <Label htmlFor="discount" className="text-sm">
                   Do not fill in my personal information for a 50% discount

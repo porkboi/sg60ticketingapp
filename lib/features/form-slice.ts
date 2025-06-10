@@ -1,10 +1,13 @@
 import { createSlice, type PayloadAction } from "@reduxjs/toolkit"
 
-interface FormData {
+export interface FormData {  // Form Control
   adultTickets: number
   childTickets: number
   proceedToRegistration: boolean
   acknowledgedIntro: boolean
+  discount?: boolean
+  adultForms?: FormData[]
+  childForms?: FormData[]
   salutation: string
   firstName: string
   lastName: string
@@ -33,7 +36,7 @@ interface FormData {
   contactNumber: string
 }
 
-interface FormState {
+export interface FormState {
   currentStep: number
   formData: FormData
   schema: Record<string, any>
@@ -41,7 +44,14 @@ interface FormState {
   childForms: FormData[]
 }
 
-const initialAdultForm = {
+const initialAdultForm: FormData = {  // Adding FormData properties
+  adultTickets: 1,
+  childTickets: 0,
+  proceedToRegistration: false,
+  acknowledgedIntro: false,
+  discount: false,
+  adultForms: [],
+  childForms: [],
   salutation: "",
   firstName: "",
   lastName: "",
@@ -66,33 +76,60 @@ const initialAdultForm = {
   financialSector: "",
   jobFunction: "",
   otherJobFunction: "",
-  contactNumber: "",
+  contactNumber: ""
 };
 
-const initialChildForm = {
+const initialChildForm: FormData = {  // Adding FormData properties
+  adultTickets: 0,
+  childTickets: 1,
+  proceedToRegistration: false,
+  acknowledgedIntro: false,
+  discount: false,
+  adultForms: [],
+  childForms: [],
+  salutation: "",
   firstName: "",
   lastName: "",
   email: "",
-  contactNumber: "",
+  nationality: "",
+  otherNationality: "",
+  isPermanentResident: false,
+  countryOfResidence: "",
+  otherCountryResidence: "",
+  stateOfResidence: "",
+  cityOfResidence: "",
   occupation: "Student",
+  otherOccupation: "",
   school: "",
   qualification: "",
+  otherQualification: "",
   courseOfStudy: "",
+  otherCourseOfStudy: "",
   graduationYear: "",
+  industry: "",
+  otherIndustry: "",
+  financialSector: "",
+  jobFunction: "",
+  otherJobFunction: "",
+  contactNumber: ""
 };
 
-const initialState = {
+const initialState: FormState = {
   currentStep: 1,
   formData: {
     ...initialAdultForm,
-    ...initialChildForm,
     adultTickets: 1,
     childTickets: 0,
+    proceedToRegistration: false,
+    acknowledgedIntro: false,
+    discount: false,
+    adultForms: [],
+    childForms: []
   },
   schema: {},
-  adultForms: [{ ...initialAdultForm }], // at least one object for the default ticket
-  childForms: [],
-}
+  adultForms: [],
+  childForms: []
+};
 
 const buildSchema = (formData: FormData) => {
   const schema: Record<string, any> = {}
@@ -205,89 +242,43 @@ const buildSchema = (formData: FormData) => {
 }
 
 const formSlice = createSlice({
-  name: "form",
+  name: 'form',
   initialState,
   reducers: {
     nextStep: (state) => {
-      state.currentStep += 1
-      state.schema = buildSchema(state.formData)
+      state.currentStep += 1;
     },
     prevStep: (state) => {
-      state.currentStep = Math.max(1, state.currentStep - 1)
-    },
-    updateField: (state, action) => {
+      state.currentStep -= 1;
+    },    updateField: (state, action: PayloadAction<{ field: keyof FormData; value: any }>) => {
       const { field, value } = action.payload;
-      // If updating ticket numbers, update both formData and arrays
-      if (field === "adultTickets") {
-        state.formData.adultTickets = value;
-        const newCount = Number(value);
-        while (state.adultForms.length < newCount) {
-          state.adultForms.push({ ...initialAdultForm });
-        }
-        while (state.adultForms.length > newCount) {
-          state.adultForms.pop();
-        }
-        return;
-      }
-      if (field === "childTickets") {
-        state.formData.childTickets = value;
-        const newCount = Number(value);
-        while (state.childForms.length < newCount) {
-          state.childForms.push({ ...initialChildForm });
-        }
-        while (state.childForms.length > newCount) {
-          state.childForms.pop();
-        }
-        return;
-      }
-      // Default: update formData
-      state.formData[field] = value;
+      (state.formData as any)[field] = value;
+      state.schema = buildSchema(state.formData);
     },
-    updateAdultForm: (state, action) => {
-      const { index, data } = action.payload;
-      state.adultForms[index] = { ...state.adultForms[index], ...data };
-    },
-    updateChildForm: (state, action) => {
-      const { index, data } = action.payload;
-      state.childForms[index] = { ...state.childForms[index], ...data };
+    updateSchema: (state) => {
+      state.schema = buildSchema(state.formData);
     },
     resetForm: (state) => {
-      state.currentStep = 1
-      state.formData = {
-        adultTickets: 1,
-        childTickets: 0,
-        proceedToRegistration: false,
-        acknowledgedIntro: false,
-        salutation: "",
-        firstName: "",
-        lastName: "",
-        email: "",
-        nationality: "",
-        otherNationality: "",
-        isPermanentResident: null,
-        countryOfResidence: "",
-        otherCountryResidence: "",
-        stateOfResidence: "California",
-        cityOfResidence: "San Francisco",
-        occupation: "",
-        otherOccupation: "",
-        school: "",
-        qualification: "",
-        otherQualification: "",
-        courseOfStudy: "",
-        otherCourseOfStudy: "",
-        graduationYear: "",
-        // Professional defaults
-        industry: "",
-        otherIndustry: "",
-        financialSector: "",
-        jobFunction: "",
-        otherJobFunction: "",
-      }
-      state.schema = {}
+      state.formData = initialAdultForm;
+      state.currentStep = 1;
+      state.schema = {};
+      state.adultForms = [];
+      state.childForms = [];
     },
-  },
-})
+    addAdultForm: (state) => {
+      state.adultForms.push({ ...initialAdultForm });
+    },
+    addChildForm: (state) => {
+      state.childForms.push({ ...initialChildForm });
+    },
+    removeAdultForm: (state, action: PayloadAction<number>) => {
+      state.adultForms.splice(action.payload, 1);
+    },
+    removeChildForm: (state, action: PayloadAction<number>) => {
+      state.childForms.splice(action.payload, 1);
+    }
+  }
+});
 
-export const { updateField, updateAdultForm, updateChildForm, resetForm } = formSlice.actions
+export const { updateField, updateSchema, resetForm, addAdultForm, addChildForm, removeAdultForm, removeChildForm } = formSlice.actions
 export default formSlice.reducer
