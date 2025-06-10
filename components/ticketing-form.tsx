@@ -1222,37 +1222,40 @@ export default function TicketingForm({}: Props) {
 
       {/* Registrant Information */}
       {!formData.discount && (
-        <Card className="mt-8">
-          <CardHeader>
-            <CardTitle>Registrant Information</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <Input
-              id="firstName"
-              value={formData.firstName}
-              onChange={(e: ChangeEvent<HTMLInputElement>) => handleFieldUpdate("firstName", e.target.value)}
-              placeholder="First Name"
-            />
-            <Input
-              id="lastName"
-              value={formData.lastName}
-              onChange={(e: ChangeEvent<HTMLInputElement>) => handleFieldUpdate("lastName", e.target.value)}
-              placeholder="Last Name"
-            />
-            <Input
-              id="email"
-              value={formData.email}
-              onChange={(e: ChangeEvent<HTMLInputElement>) => handleFieldUpdate("email", e.target.value)}
-              placeholder="Email Address"
-            />
-            <Input
-              id="contactNumber"
-              value={formData.contactNumber}
-              onChange={(e: ChangeEvent<HTMLInputElement>) => handleFieldUpdate("contactNumber", e.target.value)}
-              placeholder="Contact Number"
-            />
-          </CardContent>
-        </Card>
+        <div className="my-8">
+          {renderBubbles()}
+          <Card className="mt-8">
+            <CardHeader>
+              <CardTitle>Registrant Information</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <Input
+                id="firstName"
+                value={formData.firstName}
+                onChange={(e: ChangeEvent<HTMLInputElement>) => handleFieldUpdate("firstName", e.target.value)}
+                placeholder="First Name"
+              />
+              <Input
+                id="lastName"
+                value={formData.lastName}
+                onChange={(e: ChangeEvent<HTMLInputElement>) => handleFieldUpdate("lastName", e.target.value)}
+                placeholder="Last Name"
+              />
+              <Input
+                id="email"
+                value={formData.email}
+                onChange={(e: ChangeEvent<HTMLInputElement>) => handleFieldUpdate("email", e.target.value)}
+                placeholder="Email Address"
+              />
+              <Input
+                id="contactNumber"
+                value={formData.contactNumber}
+                onChange={(e: ChangeEvent<HTMLInputElement>) => handleFieldUpdate("contactNumber", e.target.value)}
+                placeholder="Contact Number"
+              />
+            </CardContent>
+          </Card>
+        </div>
       )}
     </div>
   )
