@@ -473,7 +473,7 @@ export default function TicketingForm() {
                   onCheckedChange={(checked) => handleFieldUpdate("discount", checked)}
                 />
                 <Label htmlFor="discount" className="text-sm">
-                  Fill in my personal information for a 50% discount
+                  Do not fill in my personal information for a 50% discount
                 </Label>
               </div>
             </div>
