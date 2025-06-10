@@ -1235,49 +1235,45 @@ export default function TicketingForm() {
       {/* After Ticket Selection - Adult and Child Registration Forms */}
       {formData.proceedToRegistration && formData.discount && (
         <div className="my-8">
-          {/* Bubble Progress Bar */}
+          {/* Bubble Progress Bar for all people */}
           <div className="flex justify-center gap-4 mb-6">
-            {Array.from({ length: formData.adultTickets }).map((_, idx) => (
-              <div
+            {Array.from({ length: adultTickets + childTickets }).map((_, idx) => (
+              <button
                 key={idx}
+                type="button"
+                onClick={() => setCurrentPersonIndex(idx)}
                 className={cn(
                   "w-8 h-8 rounded-full flex items-center justify-center border-2",
-                  idx === currentAdultIndex
+                  idx === currentPersonIndex
                     ? "bg-blue-600 text-white border-blue-600"
                     : "bg-white text-blue-600 border-blue-300"
                 )}
+                title={idx < adultTickets ? `Adult ${idx + 1}` : `Child ${idx - adultTickets + 1}`}
               >
-                {idx + 1}
-              </div>
+                {idx < adultTickets ? idx + 1 : String.fromCharCode(65 + (idx - adultTickets))}
+              </button>
             ))}
           </div>
 
-          {/* Render a form for the current adult */}
-          <AdultRegistrationForm
-            index={currentAdultIndex}
-            formData={formData.adultForms?.[currentAdultIndex] || {}}
-            onChange={(data) => handleAdultFormChange(currentAdultIndex, data)}
-            onNext={() => setCurrentAdultIndex((i) => i + 1)}
-            onPrev={() => setCurrentAdultIndex((i) => i - 1)}
-            isLast={currentAdultIndex === adultTickets - 1}
-          />
-
-          {/* Render child forms (autofilled as Student) */}
-          {formData.childTickets > 0 && (
-            <div className="mt-8">
-              <h3 className="text-lg font-semibold mb-2">Children</h3>
-              {Array.from({ length: childTickets }).map((_, idx) => (
-                <ChildRegistrationForm
-                  key={idx}
-                  index={idx}
-                  formData={{
-                    ...formData.childForms?.[idx],
-                    occupation: "Student",
-                  }}
-                  onChange={(data) => handleChildFormChange(idx, data)}
-                />
-              ))}
-            </div>
+          {/* Render the correct form for the current person */}
+          {currentPersonIndex < adultTickets ? (
+            <AdultRegistrationForm
+              index={currentPersonIndex}
+              formData={formData.adultForms?.[currentPersonIndex] || {}}
+              onChange={(data) => handleAdultFormChange(currentPersonIndex, data)}
+              onNext={() => setCurrentPersonIndex((i) => Math.min(i + 1, adultTickets + childTickets - 1))}
+              onPrev={() => setCurrentPersonIndex((i) => Math.max(i - 1, 0))}
+              isLast={currentPersonIndex === adultTickets + childTickets - 1}
+            />
+          ) : (
+            <ChildRegistrationForm
+              index={currentPersonIndex - adultTickets}
+              formData={{
+                ...formData.childForms?.[currentPersonIndex - adultTickets],
+                occupation: "Student",
+              }}
+              onChange={(data) => handleChildFormChange(currentPersonIndex - adultTickets, data)}
+            />
           )}
         </div>
       )}
