@@ -87,7 +87,7 @@ export default function TicketingForm({}: Props) {
       case "lastName":
         return formData[`${currentPersonIndex}.lastName`]?.trim() !== ""
       case "email":
-        return formData[`${currentPersonIndex}.email`]?.trim() !== "" && formData[`${currentPersonIndex}.email`].includes("@")
+        return formData[`${currentPersonIndex}.email`]?.trim() !== "" && formData[`${currentPersonIndex}.email`]?.includes("@")
       case "nationality":
         return (
           formData[`${currentPersonIndex}.nationality`] !== "" &&
