@@ -80,7 +80,7 @@ export default function TicketingForm({}: Props) {
 
   // Add explicit type for onValueChange handlers
   const handleValueChange = (field: keyof FormData) => (value: string) => {
-    handleSingleFieldUpdate(field, value)
+    handleFieldUpdate(field, value)
   }
 
   // Add explicit type for onCheckedChange handlers
