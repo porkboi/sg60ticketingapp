@@ -309,10 +309,7 @@ export default function TicketingForm({}: Props) {
           </p>
           <div className="space-y-4">
             {completedRegistrations.map((registration) => (
-              <div 
-                key={registration.id} 
-                className="bg-white p-4 rounded-lg border border-gray-200"
-              >
+              <div key={registration.id} className="bg-white p-4 rounded-lg border border-gray-200">
                 <h3 className="font-semibold mb-2 text-gray-800">
                   {registration.type === "adult" ? "Adult" : "Child"} Registration
                 </h3>
@@ -327,6 +324,8 @@ export default function TicketingForm({}: Props) {
               className="flex-1 bg-green-600 hover:bg-green-700"
               onClick={() => {
                 // Handle final submission
+                console.log("Submitting registrations:", completedRegistrations);
+                // Add your submission logic here
               }}
             >
               Submit All Registrations
@@ -334,9 +333,9 @@ export default function TicketingForm({}: Props) {
             <Button
               className="border-green-300 text-green-700 hover:bg-green-50"
               onClick={() => {
-                setShowCompletion(false)
-                dispatch(clearRegistrations())
-                dispatch(resetForm())
+                setShowCompletion(false);
+                dispatch(clearRegistrations());
+                dispatch(resetForm());
               }}
             >
               Start Over
