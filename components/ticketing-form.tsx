@@ -380,6 +380,14 @@ export default function TicketingForm({}: Props) {
                 onChange={(e) => dispatch(updateField({ field: "contactNumber", value: e.target.value }))}
                 placeholder="Contact Number"
               />
+              {isFormComplete(currentPersonIndex) && currentPersonIndex < (adultTickets + childTickets - 1) && (
+                <Button 
+                  className="w-full bg-blue-600 hover:bg-blue-700 mt-4"
+                  onClick={() => setCurrentPersonIndex(currentPersonIndex + 1)}
+                >
+                  Next Person
+                </Button>
+              )}
             </CardContent>
           </Card>
         )
@@ -392,26 +400,46 @@ export default function TicketingForm({}: Props) {
     }    // Discount checked: show full forms for adults, student forms for children
     if (currentPersonIndex < adultTickets) {
       return (
-        <AdultRegistrationForm
-          index={currentPersonIndex}
-          formData={formData.adultForms?.[currentPersonIndex] || {}}
-          onChange={(data) => dispatch(updateAdultForm({ index: currentPersonIndex, data }))}
-          onNext={() => setCurrentPersonIndex((i) => Math.min(i + 1, adultTickets + childTickets - 1))}
-          onPrev={() => setCurrentPersonIndex((i) => Math.max(i - 1, 0))}
-          isLast={currentPersonIndex === adultTickets + childTickets - 1}
-        />
+        <>
+          <AdultRegistrationForm
+            index={currentPersonIndex}
+            formData={formData.adultForms?.[currentPersonIndex] || {}}
+            onChange={(data) => dispatch(updateAdultForm({ index: currentPersonIndex, data }))}
+            onNext={() => setCurrentPersonIndex((i) => Math.min(i + 1, adultTickets + childTickets - 1))}
+            onPrev={() => setCurrentPersonIndex((i) => Math.max(i - 1, 0))}
+            isLast={currentPersonIndex === adultTickets + childTickets - 1}
+          />
+          {isFormComplete(currentPersonIndex) && currentPersonIndex < (adultTickets + childTickets - 1) && (
+            <Button 
+              className="w-full bg-blue-600 hover:bg-blue-700 mt-4"
+              onClick={() => setCurrentPersonIndex(currentPersonIndex + 1)}
+            >
+              Next Person
+            </Button>
+          )}
+        </>
       )
     } else {
       const childIdx = currentPersonIndex - adultTickets
       return (
-        <ChildRegistrationForm
-          index={childIdx}
-          formData={{
-            ...formData.childForms?.[childIdx],
-            occupation: "Student",
-          }}
-          onChange={(data) => dispatch(updateChildForm({ index: childIdx, data }))}
-        />
+        <>
+          <ChildRegistrationForm
+            index={childIdx}
+            formData={{
+              ...formData.childForms?.[childIdx],
+              occupation: "Student",
+            }}
+            onChange={(data) => dispatch(updateChildForm({ index: childIdx, data }))}
+          />
+          {isFormComplete(currentPersonIndex) && currentPersonIndex < (adultTickets + childTickets - 1) && (
+            <Button 
+              className="w-full bg-blue-600 hover:bg-blue-700 mt-4"
+              onClick={() => setCurrentPersonIndex(currentPersonIndex + 1)}
+            >
+              Next Person
+            </Button>
+          )}
+        </>
       )
     }
   }
