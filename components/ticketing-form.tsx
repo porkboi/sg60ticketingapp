@@ -248,7 +248,7 @@ export default function TicketingForm({}: Props) {
 
   const isFormComplete = (idx: number) => {
     if (idx >= adultTickets + childTickets) return false
-    return formData.otherJobFunction || formData.contactNumber
+    return formData.idx.otherJobFunction || formData.idx.contactNumber
   }
 
   const renderBubbles = () => (
