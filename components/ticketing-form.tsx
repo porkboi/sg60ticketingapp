@@ -31,8 +31,18 @@ interface Props {}
 export default function TicketingForm({}: Props) {
   const dispatch = useDispatch()
   const { formData, schema } = useSelector((state: RootState) => {
+    const formDataWithDefaults = new Proxy(state.form.formData as FormData, {
+      get: (target, prop) => {
+        // If the property doesn't exist, return empty string as default
+        if (typeof prop === 'string' && !(prop in target)) {
+          return ''
+        }
+        return target[prop as keyof typeof target]
+      }
+    })
+
     return {
-      formData: state.form.formData as FormData,
+      formData: formDataWithDefaults,
       schema: state.form.schema
     }
   })
@@ -89,7 +99,7 @@ export default function TicketingForm({}: Props) {
       case "intro":
         return formData[`${currentPersonIndex}.acknowledgedIntro`]
       case "salutation":
-        return formData[`${currentPersonIndex}.salutation`] !== null
+        return formData[`${currentPersonIndex}.salutation`] !== ""
       case "firstName":
         return formData[`${currentPersonIndex}.firstName`]?.trim() !== ""
       case "lastName":
