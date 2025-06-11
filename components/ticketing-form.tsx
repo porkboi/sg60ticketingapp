@@ -46,6 +46,11 @@ export default function TicketingForm({}: Props) {
   const handleFieldUpdate = (field: keyof FormData, value: unknown, idx: number = currentPersonIndex) => {
     dispatch(updateField({ field: `${idx}.${field}`, value }))
   }
+
+  const handleTicketUpdate = (field: keyof FormData, value: unknown) => {
+    dispatch(updateField({ field: `${field}`, value }))
+  }
+
   const handleRadioChange = (value: string, field: keyof FormData) => {
     handleFieldUpdate(field, value)
   }
@@ -57,7 +62,7 @@ export default function TicketingForm({}: Props) {
   const handleTicketChange = (type: "adult" | "child", increment: boolean) => {
     const currentValue = type === "adult" ? formData.adultTickets : formData.childTickets
     const newValue = increment ? currentValue + 1 : Math.max(1, currentValue - 1)
-    handleFieldUpdate(type === "adult" ? "adultTickets" : "childTickets", newValue)
+    handleTicketUpdate(type === "adult" ? "adultTickets" : "childTickets", newValue)
   }
 
   // Add explicit type for onValueChange handlers
