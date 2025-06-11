@@ -44,20 +44,28 @@ export default function TicketingForm({}: Props) {
   const childTickets = Number(formData.childTickets) || 0
 
   const handleFieldUpdate = (field: keyof FormData, value: unknown) => {
+  dispatch(updateField({ 
+    field: `${currentPersonIndex}.${field}`, 
+    value 
+  }))
+}
+
+  const handleSingleFieldUpdate = (field: keyof FormData, value: unknown) => {
     dispatch(updateField({ field, value }))
   }
+
   const handleRadioChange = (value: string, field: keyof FormData) => {
-    handleFieldUpdate(field, value)
+    handleSingleFieldUpdate(field, value)
   }
 
   const handleCheckboxChange = (checked: boolean, field: keyof FormData) => {
-    handleFieldUpdate(field, checked)
+    handleSingleFieldUpdate(field, checked)
   }
 
   const handleTicketChange = (type: "adult" | "child", increment: boolean) => {
     const currentValue = type === "adult" ? formData.adultTickets : formData.childTickets
     const newValue = increment ? currentValue + 1 : Math.max(1, currentValue - 1)
-    handleFieldUpdate(type === "adult" ? "adultTickets" : "childTickets", newValue)
+    handleSingleFieldUpdate(type === "adult" ? "adultTickets" : "childTickets", newValue)
   }
 
   // Add explicit type for onValueChange handlers
@@ -163,7 +171,7 @@ export default function TicketingForm({}: Props) {
       case "pr":
         return isStepComplete(currentPersonIndex,"nationality") && formData[`${currentPersonIndex}.nationality`] === "Others"
       case "country":
-        return isStepComplete(currentPersonIndex, "nationality") && (formData[`${currentPersonIndex}.nationality`] !== "Others" || isStepComplete(currentPersonIndex, "pr"))
+        return isStepComplete(currentPersonIndex, "nationality") && (formData[`${currentPersonIndex}.nationality`] == "Others" && isStepComplete(currentPersonIndex, "pr"))
       case "state":
         return isStepComplete(currentPersonIndex, "country") && formData[`${currentPersonIndex}.countryOfResidence`] === "United States of America"
       case "city":
@@ -1231,7 +1239,7 @@ export default function TicketingForm({}: Props) {
               </div>
 
               {isStepComplete(currentPersonIndex, "tickets") && !formData.proceedToRegistration && (                <Button
-                  onClick={() => handleFieldUpdate("proceedToRegistration", true)}
+                  onClick={() => handleSingleFieldUpdate("proceedToRegistration", true)}
                   className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 transition-all duration-300 hover:scale-105"
                 >
                   Proceed to Registration
