@@ -1,39 +1,11 @@
 import { createSlice, type PayloadAction } from "@reduxjs/toolkit"
 
-export interface FormData {  // Form Control
-  adultTickets: number
-  childTickets: number
-  proceedToRegistration: boolean
-  acknowledgedIntro: boolean
-  discount?: boolean
-  adultForms?: FormData[]
-  childForms?: FormData[]
-  salutation: string
-  firstName: string
-  lastName: string
-  email: string
-  nationality: string
-  otherNationality: string
-  isPermanentResident: boolean | null
-  countryOfResidence: string
-  otherCountryResidence: string
-  stateOfResidence: string
-  cityOfResidence: string
-  occupation: string
-  otherOccupation: string
-  school: string
-  qualification: string
-  otherQualification: string
-  courseOfStudy: string
-  otherCourseOfStudy: string
-  graduationYear: string
-  // Professional-specific fields
-  industry: string
-  otherIndustry: string
-  financialSector: string
-  jobFunction: string
-  otherJobFunction: string
-  contactNumber: string
+export interface FormData {
+  [key: string]: any; // Allow dynamic indexed fields
+  adultTickets: number;
+  childTickets: number;
+  discount: boolean;
+  proceedToRegistration: boolean;
 }
 
 export interface FormState {
@@ -48,7 +20,6 @@ const initialAdultForm: FormData = {  // Adding FormData properties
   adultTickets: 1,
   childTickets: 0,
   proceedToRegistration: false,
-  acknowledgedIntro: false,
   discount: false,
   adultForms: [],
   childForms: [],
@@ -83,7 +54,6 @@ const initialChildForm: FormData = {  // Adding FormData properties
   adultTickets: 0,
   childTickets: 1,
   proceedToRegistration: false,
-  acknowledgedIntro: false,
   discount: false,
   adultForms: [],
   childForms: [],
@@ -121,7 +91,6 @@ const initialState: FormState = {
     adultTickets: 1,
     childTickets: 0,
     proceedToRegistration: false,
-    acknowledgedIntro: false,
     discount: false,
     adultForms: [],
     childForms: []
