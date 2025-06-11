@@ -1,6 +1,6 @@
 "use client"
 
-import { type ChangeEvent, useState } from "react"
+import { type ChangeEvent, useState, useEffect } from "react"
 import { CheckCircle, Circle, Plus, Minus, Ticket } from "lucide-react"
 import { useSelector, useDispatch } from "react-redux"
 import type { ButtonProps } from "@/components/ui/button"
@@ -17,6 +17,13 @@ import { updateField, updateAdultForm, updateChildForm, resetForm } from "@/lib/
 import AdultRegistrationForm from "./AdultRegistrationForm"
 import ChildRegistrationForm from "./ChildRegistrationForm"
 import type { FormState, FormData } from "@/lib/features/form-slice"
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog"
 
 interface Props {}
 
@@ -29,6 +36,7 @@ export default function TicketingForm({}: Props) {
     }
   })
   const [currentPersonIndex, setCurrentPersonIndex] = useState(0)
+  const [showCompletion, setShowCompletion] = useState(false)
 
   const adultTickets = Number(formData.adultTickets) || 0
   const childTickets = Number(formData.childTickets) || 0
@@ -236,28 +244,106 @@ export default function TicketingForm({}: Props) {
     return total
   }
 
+  const isFormComplete = (idx: number) => {
+    if (idx >= adultTickets + childTickets) return false
+    if (idx < adultTickets) {
+      return formData.adultForms?.[idx]?.firstName && 
+             formData.adultForms?.[idx]?.lastName && 
+             formData.adultForms?.[idx]?.email
+    } else {
+      const childIdx = idx - adultTickets
+      return formData.childForms?.[childIdx]?.firstName && 
+             formData.childForms?.[childIdx]?.lastName
+    }
+  }
+
   const renderBubbles = () => (
     <div className="flex justify-center gap-4 mb-6">
-      {Array.from({ length: adultTickets + childTickets }).map((_, idx) => (
-        <button
-          key={idx}
-          type="button"
-          onClick={() => setCurrentPersonIndex(idx)}
-          className={cn(
-            "w-8 h-8 rounded-full flex items-center justify-center border-2 transition-all",
-            idx === currentPersonIndex
-              ? "bg-blue-600 text-white border-blue-600 scale-110"
-              : idx < adultTickets
-                ? "bg-white text-blue-600 border-blue-300"
-                : "bg-white text-green-600 border-green-300"
-          )}
-          title={idx < adultTickets ? `Adult ${idx + 1}` : `Child ${idx - adultTickets + 1}`}
-        >
-          {idx < adultTickets ? idx + 1 : String.fromCharCode(65 + (idx - adultTickets))}
-        </button>
-      ))}
+      {Array.from({ length: adultTickets + childTickets }).map((_, idx) => {
+        const isComplete = isFormComplete(idx)
+        const isCurrent = idx === currentPersonIndex
+        
+        return (
+          <button
+            key={idx}
+            type="button"
+            onClick={() => setCurrentPersonIndex(idx)}
+            className={cn(
+              "w-8 h-8 rounded-full flex items-center justify-center border-2 transition-all",
+              isCurrent
+                ? "bg-blue-600 text-white border-blue-600 scale-110"
+                : isComplete
+                  ? idx < adultTickets
+                    ? "bg-white text-blue-600 border-blue-300"
+                    : "bg-white text-green-600 border-green-300"
+                  : "bg-gray-100 text-gray-400 border-gray-300 cursor-not-allowed",
+            )}
+            disabled={!isComplete && !isCurrent && idx !== getFirstIncompleteIndex()}
+            title={idx < adultTickets ? `Adult ${idx + 1}` : `Child ${idx - adultTickets + 1}`}
+          >
+            {idx < adultTickets ? idx + 1 : String.fromCharCode(65 + (idx - adultTickets))}
+          </button>
+        )
+      })}
     </div>
   )
+
+  const getFirstIncompleteIndex = () => {
+    for (let i = 0; i < adultTickets + childTickets; i++) {
+      if (!isFormComplete(i)) return i
+    }
+    return adultTickets + childTickets - 1
+  }
+
+  const areAllFormsComplete = () => {
+    for (let i = 0; i < adultTickets + childTickets; i++) {
+      if (!isFormComplete(i)) return false
+    }
+    return true
+  }
+
+  // Replace the completion section with this dialog
+  const renderCompletionDialog = () => (
+    <Dialog open={showCompletion} onOpenChange={setShowCompletion}>
+      <DialogContent className="max-w-3xl max-h-[80vh] overflow-auto">
+        <DialogHeader>
+          <DialogTitle>Registration Complete!</DialogTitle>
+        </DialogHeader>
+        <div className="space-y-4">
+          <p className="text-green-700">
+            Thank you for joining the Singapore Global Network! Your registration has been completed successfully.
+          </p>
+          <div className="bg-white p-4 rounded-lg border border-green-200">
+            <h3 className="font-semibold mb-2 text-green-800">Registration Data:</h3>
+            <pre className="text-xs text-left overflow-auto bg-gray-50 p-2 rounded text-gray-700">
+              {JSON.stringify(formData, null, 2)}
+            </pre>
+          </div>
+          <div className="flex gap-2">
+            <Button className="flex-1 bg-green-600 hover:bg-green-700">
+              Submit Registration
+            </Button>
+            <Button
+              className="border-green-300 text-green-700 hover:bg-green-50"
+              onClick={() => {
+                setShowCompletion(false)
+                dispatch(resetForm())
+              }}
+            >
+              Start Over
+            </Button>
+          </div>
+        </div>
+      </DialogContent>
+    </Dialog>
+  )
+
+  // Update the form completion logic to show the dialog
+  useEffect(() => {
+    if (areAllFormsComplete()) {
+      setShowCompletion(true)
+    }
+  }, [formData])
 
   // Render the correct form for the current person
   const renderPersonForm = () => {
