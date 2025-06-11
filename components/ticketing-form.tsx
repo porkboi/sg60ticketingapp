@@ -24,6 +24,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog"
+import { addRegistration, clearRegistrations } from "@/lib/features/completed-registrations-slice"
 
 interface Props {}
 
@@ -35,6 +36,7 @@ export default function TicketingForm({}: Props) {
       schema: state.form.schema
     }
   })
+  const completedRegistrations = useSelector((state: RootState) => state.completedRegistrations.registrations)
   const [currentPersonIndex, setCurrentPersonIndex] = useState(0)
   const [showCompletion, setShowCompletion] = useState(false)
 
@@ -311,22 +313,37 @@ export default function TicketingForm({}: Props) {
         </DialogHeader>
         <div className="space-y-4">
           <p className="text-green-700">
-            Thank you for joining the Singapore Global Network! Your registration has been completed successfully.
+            Thank you for joining the Singapore Global Network! All registrations have been completed successfully.
           </p>
-          <div className="bg-white p-4 rounded-lg border border-green-200">
-            <h3 className="font-semibold mb-2 text-green-800">Registration Data:</h3>
-            <pre className="text-xs text-left overflow-auto bg-gray-50 p-2 rounded text-gray-700">
-              {JSON.stringify(formData, null, 2)}
-            </pre>
+          <div className="space-y-4">
+            {completedRegistrations.map((registration) => (
+              <div 
+                key={registration.id} 
+                className="bg-white p-4 rounded-lg border border-gray-200"
+              >
+                <h3 className="font-semibold mb-2 text-gray-800">
+                  {registration.type === "adult" ? "Adult" : "Child"} Registration
+                </h3>
+                <pre className="text-xs text-left overflow-auto bg-gray-50 p-2 rounded text-gray-700">
+                  {JSON.stringify(registration.data, null, 2)}
+                </pre>
+              </div>
+            ))}
           </div>
           <div className="flex gap-2">
-            <Button className="flex-1 bg-green-600 hover:bg-green-700">
-              Submit Registration
+            <Button 
+              className="flex-1 bg-green-600 hover:bg-green-700"
+              onClick={() => {
+                // Handle final submission
+              }}
+            >
+              Submit All Registrations
             </Button>
             <Button
               className="border-green-300 text-green-700 hover:bg-green-50"
               onClick={() => {
                 setShowCompletion(false)
+                dispatch(clearRegistrations())
                 dispatch(resetForm())
               }}
             >
@@ -344,6 +361,26 @@ export default function TicketingForm({}: Props) {
       setShowCompletion(true)
     }
   }, [formData])
+
+  // Modify the effect to add completed registrations
+  useEffect(() => {
+    if (isFormComplete(currentPersonIndex)) {
+      const registrationData = currentPersonIndex < adultTickets 
+        ? formData.adultForms?.[currentPersonIndex]
+        : formData.childForms?.[currentPersonIndex - adultTickets]
+      
+      dispatch(addRegistration({
+        id: `${currentPersonIndex}-${Date.now()}`,
+        type: currentPersonIndex < adultTickets ? "adult" : "child",
+        data: registrationData,
+        timestamp: Date.now()
+      }))
+
+      if (currentPersonIndex === adultTickets + childTickets - 1) {
+        setShowCompletion(true)
+      }
+    }
+  }, [formData, currentPersonIndex])
 
   // Render the correct form for the current person
   const renderPersonForm = () => {
@@ -380,14 +417,6 @@ export default function TicketingForm({}: Props) {
                 onChange={(e) => dispatch(updateField({ field: "contactNumber", value: e.target.value }))}
                 placeholder="Contact Number"
               />
-              {isFormComplete(currentPersonIndex) && currentPersonIndex < (adultTickets + childTickets - 1) && (
-                <Button 
-                  className="w-full bg-blue-600 hover:bg-blue-700 mt-4"
-                  onClick={() => setCurrentPersonIndex(currentPersonIndex + 1)}
-                >
-                  Next Person
-                </Button>
-              )}
             </CardContent>
           </Card>
         )
@@ -1331,6 +1360,14 @@ export default function TicketingForm({}: Props) {
         <div className="my-8">
           {renderBubbles()}
           {renderConsolidatedForm()}
+          {isFormComplete(currentPersonIndex) && currentPersonIndex < (adultTickets + childTickets - 1) && (
+                <Button 
+                  className="w-full bg-blue-600 hover:bg-blue-700 mt-4"
+                  onClick={() => setCurrentPersonIndex(currentPersonIndex + 1)}
+                >
+                  Next Person
+                </Button>
+              )}
         </div>
       )}
 
@@ -1367,6 +1404,14 @@ export default function TicketingForm({}: Props) {
                 onChange={(e: ChangeEvent<HTMLInputElement>) => handleFieldUpdate("contactNumber", e.target.value)}
                 placeholder="Contact Number"
               />
+              {isFormComplete(currentPersonIndex) && currentPersonIndex < (adultTickets + childTickets - 1) && (
+                <Button 
+                  className="w-full bg-blue-600 hover:bg-blue-700 mt-4"
+                  onClick={() => setCurrentPersonIndex(currentPersonIndex + 1)}
+                >
+                  Next Person
+                </Button>
+              )}
             </CardContent>
           </Card>
         </div>
