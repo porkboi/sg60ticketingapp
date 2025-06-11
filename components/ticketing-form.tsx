@@ -149,7 +149,7 @@ export default function TicketingForm({}: Props) {
       case "tickets":
         return true
       case "intro":
-        return isStepComplete(currentPersonIndex, "tickets") && formData[`${currentPersonIndex}.proceedToRegistration`]
+        return isStepComplete(currentPersonIndex, "tickets") && formData.proceedToRegistration
       case "salutation":
         return isStepComplete(currentPersonIndex, "intro")
       case "firstName":
@@ -218,7 +218,7 @@ export default function TicketingForm({}: Props) {
   const getCompletedSteps = () => {
     const idx = currentPersonIndex
     const steps = ["tickets"]
-    if (formData[`${currentPersonIndex}.proceedToRegistration`]) {
+    if (formData.proceedToRegistration) {
       steps.push("intro", "salutation", "firstName", "lastName", "email", "nationality")
       if (formData[`${currentPersonIndex}.nationality`] === "Others") steps.push("pr")
       steps.push("country")
@@ -237,7 +237,7 @@ export default function TicketingForm({}: Props) {
   const getTotalSteps = () => {
     let total = 1 // tickets
     const idx = currentPersonIndex
-    if (formData[`${currentPersonIndex}.proceedToRegistration`]) {
+    if (formData.proceedToRegistration) {
       total += 6 // intro, salutation, firstName, lastName, email, nationality
       if (formData[`${currentPersonIndex}.nationality`] === "Others") total += 1 // pr
       total += 1 // country
@@ -1124,7 +1124,7 @@ export default function TicketingForm({}: Props) {
         <CardHeader className="pb-4">
           <div className="flex items-center justify-between">
             <CardTitle className="text-lg">
-              {formData[`${currentPersonIndex}.proceedToRegistration`] ? "Registration Progress" : "Ticket Selection"}
+              {formData.proceedToRegistration} ? "Registration Progress" : "Ticket Selection"}
             </CardTitle>
             <Badge className="bg-blue-100 text-blue-800">
               {getCompletedSteps()} / {getTotalSteps()} Complete
@@ -1230,7 +1230,7 @@ export default function TicketingForm({}: Props) {
                 </div>
               </div>
 
-              {isStepComplete(currentPersonIndex, "tickets") && !formData[`${currentPersonIndex}.proceedToRegistration`] && (                <Button
+              {isStepComplete(currentPersonIndex, "tickets") && !formData.proceedToRegistration && (                <Button
                   onClick={() => handleFieldUpdate("proceedToRegistration", true)}
                   className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 transition-all duration-300 hover:scale-105"
                 >
@@ -1238,7 +1238,7 @@ export default function TicketingForm({}: Props) {
                 </Button>
               )}
 
-              {formData[`${currentPersonIndex}.proceedToRegistration`] && (
+              {formData.proceedToRegistration && (
                 <div className="text-center text-green-600 font-medium">
                   ✓ Tickets selected - Continue with registration below
                 </div>
@@ -1248,7 +1248,7 @@ export default function TicketingForm({}: Props) {
               <div className="flex items-center gap-2 mt-4">
                 <Checkbox
                   id="discount"
-                  checked={formData[`${currentPersonIndex}.discount`] || false}
+                  checked={formData.discount || false}
                   onCheckedChange={handleCheckedChange("discount")}
                 />
                 <Label htmlFor="discount" className="text-sm">
@@ -1261,7 +1261,7 @@ export default function TicketingForm({}: Props) {
       </Card>
 
       {/* After Ticket Selection - Adult and Child Registration Forms */}
-      {formData[`${currentPersonIndex}.proceedToRegistration`] && formData[`${currentPersonIndex}.discount`] && (
+      {formData.proceedToRegistration && formData.discount && (
         <div className="my-8">
           {renderBubbles()}
           {renderConsolidatedForm()}
@@ -1277,7 +1277,7 @@ export default function TicketingForm({}: Props) {
       )}
 
       {/* Registrant Information */}
-      {formData[`${currentPersonIndex}.proceedToRegistration`] && !formData[`${currentPersonIndex}.discount`] && (
+      {formData.proceedToRegistration && !formData.discount && (
         <div className="my-8">
           {renderBubbles()}
           <Card className="mt-8">
