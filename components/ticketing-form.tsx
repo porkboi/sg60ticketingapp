@@ -75,7 +75,7 @@ export default function TicketingForm({}: Props) {
 
   // Add explicit type for onCheckedChange handlers
   const handleCheckedChange = (field: keyof FormData) => (checked: boolean) => {
-    handleFieldUpdate(field, checked)
+    handleSingleFieldUpdate(field, checked)
   }
 
   const getTotalCost = () => {
