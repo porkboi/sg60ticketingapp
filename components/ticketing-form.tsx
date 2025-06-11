@@ -83,44 +83,44 @@ export default function TicketingForm({}: Props) {
       case "salutation":
         return formData[`${currentPersonIndex}.salutation`] !== ""
       case "firstName":
-        return formData[`${currentPersonIndex}.firstName`].trim() !== ""
+        return formData[`${currentPersonIndex}.firstName`]?.trim() !== ""
       case "lastName":
-        return formData[`${currentPersonIndex}.lastName`].trim() !== ""
+        return formData[`${currentPersonIndex}.lastName`]?.trim() !== ""
       case "email":
-        return formData[`${currentPersonIndex}.email`].trim() !== "" && formData[`${currentPersonIndex}.email`].includes("@")
+        return formData[`${currentPersonIndex}.email`]?.trim() !== "" && formData[`${currentPersonIndex}.email`].includes("@")
       case "nationality":
         return (
           formData[`${currentPersonIndex}.nationality`] !== "" &&
-          (formData[`${currentPersonIndex}.nationality`] === "Singapore" || formData[`${currentPersonIndex}.otherNationality`].trim() !== "")
+          (formData[`${currentPersonIndex}.nationality`] === "Singapore" || formData[`${currentPersonIndex}.otherNationality`]?.trim() !== "")
         )
       case "pr":
         return formData[`${currentPersonIndex}.nationality`] !== "Others" || formData[`${currentPersonIndex}.isPermanentResident`] !== null
       case "country":
         return (
           formData[`${currentPersonIndex}.countryOfResidence`] !== "" &&
-          (formData[`${currentPersonIndex}.countryOfResidence`] === "United States of America" || formData[`${currentPersonIndex}.otherCountryResidence`].trim() !== "")
+          (formData[`${currentPersonIndex}.countryOfResidence`] === "United States of America" || formData[`${currentPersonIndex}.otherCountryResidence`]?.trim() !== "")
         )
       case "state":
-        return formData[`${currentPersonIndex}.countryOfResidence`] !== "United States of America" || formData[`${currentPersonIndex}.stateOfResidence`].trim() !== ""
+        return formData[`${currentPersonIndex}.countryOfResidence`] !== "United States of America" || formData[`${currentPersonIndex}.stateOfResidence`]?.trim() !== ""
       case "city":
-        return formData[`${currentPersonIndex}.countryOfResidence`] !== "United States of America" || formData[`${currentPersonIndex}.cityOfResidence`].trim() !== ""
+        return formData[`${currentPersonIndex}.countryOfResidence`] !== "United States of America" || formData[`${currentPersonIndex}.cityOfResidence`]?.trim() !== ""
       case "occupation":
         return (
-          formData[`${currentPersonIndex}.occupation`] !== "" && (formData[`${currentPersonIndex}.occupation`] !== "Others" || formData[`${currentPersonIndex}.otherOccupation`].trim() !== "")
+          formData[`${currentPersonIndex}.occupation`] !== "" && (formData[`${currentPersonIndex}.occupation`] !== "Others" || formData[`${currentPersonIndex}.otherOccupation`]?.trim() !== "")
         )
       case "school":
-        return formData[`${currentPersonIndex}.occupation`] !== "Student" || formData[`${currentPersonIndex}.school`].trim() !== ""
+        return formData[`${currentPersonIndex}.occupation`] !== "Student" || formData[`${currentPersonIndex}.school`]?.trim() !== ""
       case "qualification":
         return (
           formData[`${currentPersonIndex}.occupation`] !== "Student" ||
           (formData[`${currentPersonIndex}.qualification`] !== "" &&
-            (formData[`${currentPersonIndex}.qualification`] !== "Others" || formData[`${currentPersonIndex}.otherQualification`].trim() !== ""))
+            (formData[`${currentPersonIndex}.qualification`] !== "Others" || formData[`${currentPersonIndex}.otherQualification`]?.trim() !== ""))
         )
       case "courseOfStudy":
         return (
           formData[`${currentPersonIndex}.occupation`] !== "Student" ||
           (formData[`${currentPersonIndex}.courseOfStudy`] !== "" &&
-            (formData[`${currentPersonIndex}.courseOfStudy`] !== "Others" || formData[`${currentPersonIndex}.otherCourseOfStudy`].trim() !== ""))
+            (formData[`${currentPersonIndex}.courseOfStudy`] !== "Others" || formData[`${currentPersonIndex}.otherCourseOfStudy`]?.trim() !== ""))
         )
       case "graduationYear":
         return formData[`${currentPersonIndex}.occupation`] !== "Student" || formData[`${currentPersonIndex}.graduationYear`] !== ""
@@ -128,7 +128,7 @@ export default function TicketingForm({}: Props) {
         return (
           (formData[`${currentPersonIndex}.occupation`] !== "Working Professional" &&
             formData[`${currentPersonIndex}.occupation`] !== "Business Owner and Entrepreneur") ||
-          (formData[`${currentPersonIndex}.industry`] !== "" && (formData[`${currentPersonIndex}.industry`] !== "Others" || formData[`${currentPersonIndex}.otherIndustry`].trim() !== ""))
+          (formData[`${currentPersonIndex}.industry`] !== "" && (formData[`${currentPersonIndex}.industry`] !== "Others" || formData[`${currentPersonIndex}.otherIndustry`]?.trim() !== ""))
         )
       case "financialSector":
         return formData[`${currentPersonIndex}.industry`] !== "Banking and Finance" || formData[`${currentPersonIndex}.financialSector`] !== ""
@@ -137,7 +137,7 @@ export default function TicketingForm({}: Props) {
           (formData[`${currentPersonIndex}.occupation`] !== "Working Professional" &&
             formData[`${currentPersonIndex}.occupation`] !== "Business Owner and Entrepreneur") ||
           (formData[`${currentPersonIndex}.jobFunction`] !== "" &&
-            (formData[`${currentPersonIndex}.jobFunction`] !== "Others" || formData[`${currentPersonIndex}.otherJobFunction`].trim() !== ""))
+            (formData[`${currentPersonIndex}.jobFunction`] !== "Others" || formData[`${currentPersonIndex}.otherJobFunction`]?.trim() !== ""))
         )
       default:
         return false
