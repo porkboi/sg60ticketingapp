@@ -248,7 +248,9 @@ export default function TicketingForm({}: Props) {
 
   const isFormComplete = (idx: number) => {
     if (idx >= adultTickets + childTickets) return false
-    return formData.idx.otherJobFunction || formData.idx.contactNumber
+    if (idx < adultTickets) {
+      return formData.otherJobFunction || formData.contactNumber
+    }
   }
 
   const renderBubbles = () => (
@@ -309,7 +311,10 @@ export default function TicketingForm({}: Props) {
           </p>
           <div className="space-y-4">
             {completedRegistrations.map((registration) => (
-              <div key={registration.id} className="bg-white p-4 rounded-lg border border-gray-200">
+              <div 
+                key={registration.id} 
+                className="bg-white p-4 rounded-lg border border-gray-200"
+              >
                 <h3 className="font-semibold mb-2 text-gray-800">
                   {registration.type === "adult" ? "Adult" : "Child"} Registration
                 </h3>
@@ -324,8 +329,6 @@ export default function TicketingForm({}: Props) {
               className="flex-1 bg-green-600 hover:bg-green-700"
               onClick={() => {
                 // Handle final submission
-                console.log("Submitting registrations:", completedRegistrations);
-                // Add your submission logic here
               }}
             >
               Submit All Registrations
@@ -333,9 +336,9 @@ export default function TicketingForm({}: Props) {
             <Button
               className="border-green-300 text-green-700 hover:bg-green-50"
               onClick={() => {
-                setShowCompletion(false);
-                dispatch(clearRegistrations());
-                dispatch(resetForm());
+                setShowCompletion(false)
+                dispatch(clearRegistrations())
+                dispatch(resetForm())
               }}
             >
               Start Over
@@ -464,465 +467,435 @@ export default function TicketingForm({}: Props) {
     }
   }
 
-  const renderConsolidatedForm = () => {
-    const formPrefix = `${currentPersonIndex}.`;
-    const getValue = (field: string) => formData[`${formPrefix}${field}`] || '';
-    const updateValue = (field: string, value: any) => handleFieldUpdate(`${formPrefix}${field}` as keyof FormData, value);
+  const renderConsolidatedForm = () => (
+    <Card className="mt-8">
+      <CardHeader>
+        <CardTitle>Registration</CardTitle>
+      </CardHeader>
+      <CardContent>
+        {/* Introduction Section */}
+        {shouldShowStep("intro") && (
+          <div className="mb-6">
+            <h3 className="font-semibold mb-2">Welcome to Singapore Global Network</h3>
+            <p className="text-gray-600 mb-2">
+              Singapore Global Network is a 130,000-strong community of professionals and friends seeking to deepen
+              connections in Singapore and across the globe. Whether you're in London or Longyearbyen, Spain or
+              Switzerland, you'll never be alone again.
+            </p>
+            {!isStepComplete("intro") && (
+              <Button
+                onClick={() => handleFieldUpdate("acknowledgedIntro", true)}
+                className="w-full transition-all duration-300 hover:scale-105"
+              >
+                Wonderful! Let's Get Started
+              </Button>
+            )}
+            {isStepComplete("intro") && (
+              <div className="text-center text-green-600 font-medium">✓ Ready to proceed with registration</div>
+            )}
+          </div>
+        )}
 
-    return (
-      <Card className="mt-8">
-        <CardHeader>
-          <CardTitle>Registration</CardTitle>
-        </CardHeader>
-        <CardContent>
-          {/* Introduction Section */}
-          {shouldShowStep("intro") && (
-            <div className="mb-6">
-              <h3 className="font-semibold mb-2">Welcome to Singapore Global Network</h3>
-              <p className="text-gray-600 mb-2">
-                Singapore Global Network is a 130,000-strong community of professionals and friends seeking to deepen
-                connections in Singapore and across the globe.
-              </p>
-              {!isStepComplete("intro") && (
-                <Button
-                  onClick={() => updateValue("acknowledgedIntro", true)}
-                  className="w-full transition-all duration-300 hover:scale-105"
-                >
-                  Wonderful! Let's Get Started
-                </Button>
-              )}
-              {isStepComplete("intro") && (
-                <div className="text-center text-green-600 font-medium">✓ Ready to proceed with registration</div>
-              )}
-            </div>
-          )}
-
-          {/* Form Fields */}
-          {shouldShowStep("salutation") && (
-            <RadioGroup
-              value={getValue("salutation")}
-              onValueChange={(value) => updateValue("salutation", value)}
-            >
-              {["Mr", "Mrs", "Ms", "Dr", "Prof"].map((option) => (
-                <div key={option} className="flex items-center space-x-2">
-                  <RadioGroupItem value={option} id={option} />
-                  <Label htmlFor={option} className="text-sm">
-                    {option}
-                  </Label>
-                </div>
-              ))}
-            </RadioGroup>
-          )}
-
-          {shouldShowStep("firstName") && (
-            <Input
-              value={getValue("firstName")}
-              onChange={(e) => updateValue("firstName", e.target.value)}
-              placeholder="First Name"
-            />
-          )}
-
-          {shouldShowStep("lastName") && (
-            <Input
-              value={getValue("lastName")}
-              onChange={(e) => updateValue("lastName", e.target.value)}
-              placeholder="Last Name"
-            />
-          )}
-
-          {shouldShowStep("email") && (
-            <Input
-              type="email"
-              value={getValue("email")}
-              onChange={(e) => updateValue("email", e.target.value)}
-              placeholder="Email Address"
-            />
-          )}
-
-          {shouldShowStep("nationality") && (
-            <RadioGroup
-              value={getValue("nationality")}
-              onValueChange={(value) => updateValue("nationality", value)}
-            >
-              <div className="flex items-center space-x-2">
-                <RadioGroupItem value="Singapore" id="singapore" />
-                <Label htmlFor="singapore">Singapore</Label>
-              </div>
-              <div className="flex items-center space-x-2">
-                <RadioGroupItem value="Others" id="others" />
-                <Label htmlFor="others">Others</Label>
-              </div>
-            </RadioGroup>
-          )}
-
-          {formData.nationality === "Others" && (
-            <Input
-              value={getValue("otherNationality")}
-              onChange={(e) => updateValue("otherNationality", e.target.value)}
-              placeholder="Enter nationality"
-            />
-          )}
-
-          {shouldShowStep("pr") && (
-            <div className="ml-6 space-y-4 p-4 bg-blue-50 rounded-lg animate-in slide-in-from-bottom-2">
+        {/* Personal Information Section */}
+        {shouldShowStep("salutation") && (
+          <Card className="transition-all duration-500 ease-in-out animate-in slide-in-from-bottom-4">
+            <CardHeader>
               <div className="flex items-center gap-2">
-                {isStepComplete("pr") ? (
-                  <CheckCircle className="w-4 h-4 text-green-500" />
+                {isStepComplete("occupation") &&
+                (formData.occupation !== "Student" ||
+                  (isStepComplete("school") &&
+                    isStepComplete("qualification") &&
+                    isStepComplete("courseOfStudy") &&
+                    isStepComplete("graduationYear"))) &&
+                ((formData.occupation !== "Working Professional" &&
+                  formData.occupation !== "Business Owner and Entrepreneur") ||
+                  (isStepComplete("industry") &&
+                    (formData.industry !== "Banking and Finance" || isStepComplete("financialSector")) &&
+                    isStepComplete("jobFunction"))) ? (
+                  <CheckCircle className="w-5 h-5 text-green-500" />
                 ) : (
-                  <Circle className="w-4 h-4 text-gray-400" />
+                  <Circle className="w-5 h-5 text-gray-400" />
                 )}
-                <Label className="font-medium">Permanent Resident Status</Label>
+                <CardTitle>Personal Information</CardTitle>
               </div>
-              <p className="text-sm text-gray-600">Are you a Singaporean Permanent Resident?</p>
-              <div className="flex items-center space-x-2">
-                <Checkbox
-                  id="isPR"
-                  checked={getValue("isPermanentResident") || false}
-                  onCheckedChange={(checked) => updateValue("isPermanentResident", checked)}
-                />
-                <Label htmlFor="isPR" className="text-sm">
-                  Yes, I am a Singaporean Permanent Resident
-                </Label>
-              </div>
-            </div>
-          )}
-
-          {shouldShowStep("country") && (
-            <Card className="transition-all duration-500 ease-in-out animate-in slide-in-from-bottom-4">
-              <CardHeader>
+            </CardHeader>
+            <CardContent className="space-y-6">
+              {/* Salutation */}
+              <div
+                className={cn(
+                  "space-y-3 transition-all duration-300",
+                  isStepComplete("salutation") ? "opacity-75" : "opacity-100",
+                )}
+              >
                 <div className="flex items-center gap-2">
-                  {isStepComplete("country") &&
-                  (formData.countryOfResidence !== "United States of America" ||
-                    (isStepComplete("state") && isStepComplete("city"))) ? (
-                    <CheckCircle className="w-5 h-5 text-green-500" />
+                  {isStepComplete("salutation") ? (
+                    <CheckCircle className="w-4 h-4 text-green-500" />
                   ) : (
-                    <Circle className="w-5 h-5 text-gray-400" />
+                    <Circle className="w-4 h-4 text-gray-400" />
                   )}
-                  <CardTitle>Residence Information</CardTitle>
+                  <Label className="text-sm font-medium">Salutation</Label>
                 </div>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="space-y-3">
-                  <Label className="font-medium">Country of Residence</Label>
-                  <RadioGroup
-                    value={getValue("countryOfResidence")}
-                    onValueChange={(value) => updateValue("countryOfResidence", value)}
-                  >
-                    <div className="flex items-center space-x-2">
-                      <RadioGroupItem value="United States of America" id="usa" />
-                      <Label htmlFor="usa">United States of America</Label>
+                <RadioGroup
+                  value={formData.salutation}
+                  onValueChange={handleValueChange("salutation")}
+                  className="grid grid-cols-5 gap-2"
+                >
+                  {["Mr", "Mrs", "Ms", "Dr", "Prof"].map((option) => (
+                    <div key={option} className="flex items-center space-x-2">
+                      <RadioGroupItem value={option} id={option} />
+                      <Label htmlFor={option} className="text-sm">
+                        {option}
+                      </Label>
                     </div>
-                    <div className="flex items-center space-x-2">
-                      <RadioGroupItem value="Others" id="otherCountry" />
-                      <Label htmlFor="otherCountry">Others</Label>
-                    </div>
-                  </RadioGroup>
+                  ))}
+                </RadioGroup>
+              </div>
 
-                  {formData.countryOfResidence === "Others" && (
-                    <div className="ml-6 space-y-2 animate-in slide-in-from-right-2">
-                      <Label htmlFor="otherCountryResidence">Please specify your country</Label>
-                      <Input
-                        id="otherCountryResidence"
-                        value={getValue("otherCountryResidence")}
-                        onChange={(e) => updateValue("otherCountryResidence", e.target.value)}
-                        placeholder="Enter your country of residence"
-                        className="transition-all duration-200 focus:scale-105"
-                      />
-                    </div>
+              {/* First Name */}
+              {shouldShowStep("firstName") && (
+                <div
+                  className={cn(
+                    "space-y-2 transition-all duration-300 animate-in slide-in-from-right-2",
+                    isStepComplete("firstName") ? "opacity-75" : "opacity-100",
                   )}
+                >
+                  <div className="flex items-center gap-2">
+                    {isStepComplete("firstName") ? (
+                      <CheckCircle className="w-4 h-4 text-green-500" />
+                    ) : (
+                      <Circle className="w-4 h-4 text-gray-400" />
+                    )}
+                    <Label htmlFor="firstName" className="text-sm font-medium">
+                      First Name
+                    </Label>
+                  </div>
+                  <Input
+                    id="firstName"
+                    value={formData.firstName}
+                    onChange={(e) => handleFieldUpdate("firstName", e.target.value)}
+                    placeholder="Enter your first name"
+                    className="transition-all duration-200 focus:scale-105"
+                  />
                 </div>
+              )}
 
-                {/* US State and City */}
-                {shouldShowStep("state") && (
-                  <div className="space-y-4 p-4 bg-blue-50 rounded-lg animate-in slide-in-from-bottom-2">
-                    <div className="space-y-2">
+              {/* Last Name */}
+              {shouldShowStep("lastName") && (
+                <div
+                  className={cn(
+                    "space-y-2 transition-all duration-300 animate-in slide-in-from-right-2",
+                    isStepComplete("lastName") ? "opacity-75" : "opacity-100",
+                  )}
+                >
+                  <div className="flex items-center gap-2">
+                    {isStepComplete("lastName") ? (
+                      <CheckCircle className="w-4 h-4 text-green-500" />
+                    ) : (
+                      <Circle className="w-4 h-4 text-gray-400" />
+                    )}
+                    <Label htmlFor="lastName" className="text-sm font-medium">
+                      Last Name
+                    </Label>
+                  </div>
+                  <Input
+                    id="lastName"
+                    value={formData.lastName}
+                    onChange={(e) => handleFieldUpdate("lastName", e.target.value)}
+                    placeholder="Enter your last name"
+                    className="transition-all duration-200 focus:scale-105"
+                  />
+                </div>
+              )}
+
+              {/* Email */}
+              {shouldShowStep("email") && (
+                <div
+                  className={cn(
+                    "space-y-2 transition-all duration-300 animate-in slide-in-from-right-2",
+                    isStepComplete("email") ? "opacity-75" : "opacity-100",
+                  )}
+                >
+                  <div className="flex items-center gap-2">
+                    {isStepComplete("email") ? (
+                      <CheckCircle className="w-4 h-4 text-green-500" />
+                    ) : (
+                      <Circle className="w-4 h-4 text-gray-400" />
+                    )}
+                    <Label htmlFor="email" className="text-sm font-medium">
+                      Email Address
+                    </Label>
+                  </div>
+                  <Input
+                    id="email"
+                    type="email"
+                    value={formData.email}
+                    onChange={(e) => handleFieldUpdate("email", e.target.value)}
+                    placeholder="Enter your email address"
+                    className="transition-all duration-200 focus:scale-105"
+                  />
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        )}
+
+        {/* Nationality Section */}
+        {shouldShowStep("nationality") && (
+          <Card className="transition-all duration-500 ease-in-out animate-in slide-in-from-bottom-4">
+            <CardHeader>
+              <div className="flex items-center gap-2">
+                {isStepComplete("nationality") ? (
+                  <CheckCircle className="w-5 h-5 text-green-500" />
+                ) : (
+                  <Circle className="w-5 h-5 text-gray-400" />
+                )}
+                <CardTitle>Nationality & Citizenship</CardTitle>
+              </div>
+            </CardHeader>
+            <CardContent className="space-y-4">              <RadioGroup value={formData.nationality} onValueChange={handleValueChange("nationality")}>
+                <div className="flex items-center space-x-2">
+                  <RadioGroupItem value="Singapore" id="singapore" />
+                  <Label htmlFor="singapore">Singapore</Label>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <RadioGroupItem value="Others" id="others" />
+                  <Label htmlFor="others">Others</Label>
+                </div>
+              </RadioGroup>
+
+              {formData.nationality === "Others" && (
+                <div className="ml-6 space-y-2 animate-in slide-in-from-right-2">
+                  <Label htmlFor="otherNationality">Please specify your nationality</Label>
+                  <Input
+                    id="otherNationality"
+                    value={formData.otherNationality}
+                    onChange={(e) => handleFieldUpdate("otherNationality", e.target.value)}
+                    placeholder="Enter your nationality"
+                    className="transition-all duration-200 focus:scale-105"
+                  />
+                </div>
+              )}
+
+              {/* PR Status */}
+              {shouldShowStep("pr") && (
+                <div className="ml-6 space-y-4 p-4 bg-blue-50 rounded-lg animate-in slide-in-from-bottom-2">
+                  <div className="flex items-center gap-2">
+                    {isStepComplete("pr") ? (
+                      <CheckCircle className="w-4 h-4 text-green-500" />
+                    ) : (
+                      <Circle className="w-4 h-4 text-gray-400" />
+                    )}
+                    <Label className="font-medium">Permanent Resident Status</Label>
+                  </div>
+                  <p className="text-sm text-gray-600">Are you a Singaporean Permanent Resident?</p>
+                  <div className="flex items-center space-x-2">
+                    <Checkbox
+                      id="isPR"
+                      checked={formData.isPermanentResident || false}
+                      onCheckedChange={handleCheckedChange("isPermanentResident")}
+                    />
+                    <Label htmlFor="isPR" className="text-sm">
+                      Yes, I am a Singaporean Permanent Resident
+                    </Label>
+                  </div>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        )}
+
+        {/* Residence Section */}
+        {shouldShowStep("country") && (
+          <Card className="transition-all duration-500 ease-in-out animate-in slide-in-from-bottom-4">
+            <CardHeader>
+              <div className="flex items-center gap-2">
+                {isStepComplete("country") &&
+                (formData.countryOfResidence !== "United States of America" ||
+                  (isStepComplete("state") && isStepComplete("city"))) ? (
+                  <CheckCircle className="w-5 h-5 text-green-500" />
+                ) : (
+                  <Circle className="w-5 h-5 text-gray-400" />
+                )}
+                <CardTitle>Residence Information</CardTitle>
+              </div>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="space-y-3">
+                <Label className="font-medium">Country of Residence</Label>
+                <RadioGroup
+                  value={formData.countryOfResidence}
+                  onValueChange={handleValueChange("countryOfResidence")}
+                >
+                  <div className="flex items-center space-x-2">
+                    <RadioGroupItem value="United States of America" id="usa" />
+                    <Label htmlFor="usa">United States of America</Label>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <RadioGroupItem value="Others" id="otherCountry" />
+                    <Label htmlFor="otherCountry">Others</Label>
+                  </div>
+                </RadioGroup>
+
+                {formData.countryOfResidence === "Others" && (
+                  <div className="ml-6 space-y-2 animate-in slide-in-from-right-2">
+                    <Label htmlFor="otherCountryResidence">Please specify your country</Label>
+                    <Input
+                      id="otherCountryResidence"
+                      value={formData.otherCountryResidence}
+                      onChange={(e) => handleFieldUpdate("otherCountryResidence", e.target.value)}
+                      placeholder="Enter your country of residence"
+                      className="transition-all duration-200 focus:scale-105"
+                    />
+                  </div>
+                )}
+              </div>
+
+              {/* US State and City */}
+              {shouldShowStep("state") && (
+                <div className="space-y-4 p-4 bg-blue-50 rounded-lg animate-in slide-in-from-bottom-2">
+                  <div className="space-y-2">
+                    <div className="flex items-center gap-2">
+                      {isStepComplete("state") ? (
+                        <CheckCircle className="w-4 h-4 text-green-500" />
+                      ) : (
+                        <Circle className="w-4 h-4 text-gray-400" />
+                      )}
+                      <Label htmlFor="state" className="font-medium">
+                        State of Residence
+                      </Label>
+                    </div>
+                    <Input
+                      id="state"
+                      value={formData.stateOfResidence}
+                      onChange={(e) => handleFieldUpdate("stateOfResidence", e.target.value)}
+                      placeholder="California"
+                      className="transition-all duration-200 focus:scale-105"
+                    />
+                  </div>
+
+                  {shouldShowStep("city") && (
+                    <div className="space-y-2 animate-in slide-in-from-right-2">
                       <div className="flex items-center gap-2">
-                        {isStepComplete("state") ? (
+                        {isStepComplete("city") ? (
                           <CheckCircle className="w-4 h-4 text-green-500" />
                         ) : (
                           <Circle className="w-4 h-4 text-gray-400" />
                         )}
-                        <Label htmlFor="state" className="font-medium">
-                          State of Residence
+                        <Label htmlFor="city" className="font-medium">
+                          City of Residence
                         </Label>
                       </div>
                       <Input
-                        id="state"
-                        value={getValue("stateOfResidence")}
-                        onChange={(e) => updateValue("stateOfResidence", e.target.value)}
-                        placeholder="California"
-                        className="transition-all duration-200 focus:scale-105"
-                      />
-                    </div>
-
-                    {shouldShowStep("city") && (
-                      <div className="space-y-2 animate-in slide-in-from-right-2">
-                        <div className="flex items-center gap-2">
-                          {isStepComplete("city") ? (
-                            <CheckCircle className="w-4 h-4 text-green-500" />
-                          ) : (
-                            <Circle className="w-4 h-4 text-gray-400" />
-                          )}
-                          <Label htmlFor="city" className="font-medium">
-                            City of Residence
-                          </Label>
-                        </div>
-                        <Input
-                          id="city"
-                          value={getValue("cityOfResidence")}
-                          onChange={(e) => updateValue("cityOfResidence", e.target.value)}
-                          placeholder="San Francisco"
-                          className="transition-all duration-200 focus:scale-105"
-                        />
-                      </div>
-                    )}
-                  </div>
-                )}
-              </CardContent>
-            </Card>
-          )}
-
-          {shouldShowStep("occupation") && (
-            <Card className="transition-all duration-500 ease-in-out animate-in slide-in-from-bottom-4">
-              <CardHeader>
-                <div className="flex items-center gap-2">
-                  {isStepComplete("occupation") &&
-                  (formData.occupation !== "Student" ||
-                    (isStepComplete("school") &&
-                      isStepComplete("qualification") &&
-                      isStepComplete("courseOfStudy") &&
-                      isStepComplete("graduationYear"))) &&
-                  ((formData.occupation !== "Working Professional" &&
-                    formData.occupation !== "Business Owner and Entrepreneur") ||
-                    (isStepComplete("industry") &&
-                      (formData.industry !== "Banking and Finance" || isStepComplete("financialSector")) &&
-                      isStepComplete("jobFunction"))) ? (
-                    <CheckCircle className="w-5 h-5 text-green-500" />
-                  ) : (
-                    <Circle className="w-5 h-5 text-gray-400" />
-                  )}
-                  <CardTitle>Professional Information</CardTitle>
-                </div>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="space-y-3">
-                  <Label className="font-medium">Occupation</Label>
-                  <RadioGroup
-                    value={getValue("occupation")}
-                    onValueChange={(value) => updateValue("occupation", value)}
-                    className="space-y-2"
-                  >
-                    {["Student", "Working Professional", "Business Owner and Entrepreneur", "Others"].map((option) => (
-                      <div key={option} className="flex items-center space-x-2">
-                        <RadioGroupItem value={option} id={option.replace(/\s+/g, "")} />
-                        <Label htmlFor={option.replace(/\s+/g, "")}>{option}</Label>
-                      </div>
-                    ))}
-                  </RadioGroup>
-
-                  {formData.occupation === "Others" && (
-                    <div className="ml-6 space-y-2 animate-in slide-in-from-right-2">
-                      <Label htmlFor="otherOccupation">Please specify your occupation</Label>
-                      <Input
-                        id="otherOccupation"
-                        value={getValue("otherOccupation")}
-                        onChange={(e) => updateValue("otherOccupation", e.target.value)}
-                        placeholder="Enter your occupation"
+                        id="city"
+                        value={formData.cityOfResidence}
+                        onChange={(e) => handleFieldUpdate("cityOfResidence", e.target.value)}
+                        placeholder="San Francisco"
                         className="transition-all duration-200 focus:scale-105"
                       />
                     </div>
                   )}
                 </div>
+              )}
+            </CardContent>
+          </Card>
+        )}
 
-                {/* Student-specific sections */}
-                {shouldShowStep("school") && (
-                  <div className="space-y-4 p-4 bg-blue-50 rounded-lg animate-in slide-in-from-bottom-2">
-                    <div className="space-y-2">
-                      <div className="flex items-center gap-2">
-                        {isStepComplete("school") ? (
-                          <CheckCircle className="w-4 h-4 text-green-500" />
-                        ) : (
-                          <Circle className="w-4 h-4 text-gray-400" />
-                        )}
-                        <Label htmlFor="school" className="font-medium">
-                          School/University
-                        </Label>
-                      </div>
-                      <Input
-                        id="school"
-                        value={getValue("school")}
-                        onChange={(e) => updateValue("school", e.target.value)}
-                        placeholder="Enter your school or university name"
-                        className="transition-all duration-200 focus:scale-105"
-                      />
+        {/* Occupation Section */}
+        {shouldShowStep("occupation") && (
+          <Card className="transition-all duration-500 ease-in-out animate-in slide-in-from-bottom-4">
+            <CardHeader>
+              <div className="flex items-center gap-2">
+                {isStepComplete("occupation") &&
+                (formData.occupation !== "Student" ||
+                  (isStepComplete("school") &&
+                    isStepComplete("qualification") &&
+                    isStepComplete("courseOfStudy") &&
+                    isStepComplete("graduationYear"))) &&
+                ((formData.occupation !== "Working Professional" &&
+                  formData.occupation !== "Business Owner and Entrepreneur") ||
+                  (isStepComplete("industry") &&
+                    (formData.industry !== "Banking and Finance" || isStepComplete("financialSector")) &&
+                    isStepComplete("jobFunction"))) ? (
+                  <CheckCircle className="w-5 h-5 text-green-500" />
+                ) : (
+                  <Circle className="w-5 h-5 text-gray-400" />
+                )}
+                <CardTitle>Professional Information</CardTitle>
+              </div>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="space-y-3">
+                <Label className="font-medium">Occupation</Label>
+                <RadioGroup
+                  value={formData.occupation}
+                  onValueChange={handleValueChange("occupation")}
+                  className="space-y-2"
+                >
+                  {["Student", "Working Professional", "Business Owner and Entrepreneur", "Others"].map((option) => (
+                    <div key={option} className="flex items-center space-x-2">
+                      <RadioGroupItem value={option} id={option.replace(/\s+/g, "")} />
+                      <Label htmlFor={option.replace(/\s+/g, "")}>{option}</Label>
                     </div>
+                  ))}
+                </RadioGroup>
 
-                    {shouldShowStep("qualification") && (
-                      <div className="space-y-3 animate-in slide-in-from-right-2">
-                        <div className="flex items-center gap-2">
-                          {isStepComplete("qualification") ? (
-                            <CheckCircle className="w-4 h-4 text-green-500" />
-                          ) : (
-                            <Circle className="w-4 h-4 text-gray-400" />
-                          )}
-                          <Label className="font-medium">Qualification Currently Pursuing</Label>
-                        </div>
-                        <RadioGroup
-                          value={getValue("qualification")}
-                          onValueChange={(value) => updateValue("qualification", value)}
-                          className="space-y-2"
-                        >
-                          {[
-                            "Diploma and Other Professional Qualifications",
-                            "Bachelor's or Equivalent",
-                            "Postgraduate Diploma / Certificate (Excluding Master's and Doctorate)",
-                            "Master's and Doctorate or Equivalent",
-                            "Others",
-                          ].map((option) => (
-                            <div key={option} className="flex items-center space-x-2">
-                              <RadioGroupItem value={option} id={option.replace(/[^a-zA-Z0-9]/g, "")} />
-                              <Label htmlFor={option.replace(/[^a-zA-Z0-9]/g, "")} className="text-sm">
-                                {option}
-                              </Label>
-                            </div>
-                          ))}
-                        </RadioGroup>
-
-                        {formData.qualification === "Others" && (
-                          <div className="ml-6 space-y-2 animate-in slide-in-from-right-2">
-                            <Label htmlFor="otherQualification">Please specify your qualification</Label>
-                            <Input
-                              id="otherQualification"
-                              value={getValue("otherQualification")}
-                              onChange={(e) => updateValue("otherQualification", e.target.value)}
-                              placeholder="Enter your qualification"
-                              className="transition-all duration-200 focus:scale-105"
-                            />
-                          </div>
-                        )}
-                      </div>
-                    )}
-
-                    {shouldShowStep("courseOfStudy") && (
-                      <div className="space-y-3 animate-in slide-in-from-right-2">
-                        <div className="flex items-center gap-2">
-                          {isStepComplete("courseOfStudy") ? (
-                            <CheckCircle className="w-4 h-4 text-green-500" />
-                          ) : (
-                            <Circle className="w-4 h-4 text-gray-400" />
-                          )}
-                          <Label className="font-medium">Course of Study</Label>
-                        </div>
-                        <RadioGroup
-                          value={getValue("courseOfStudy")}
-                          onValueChange={(value) => updateValue("courseOfStudy", value)}
-                          className="space-y-2 max-h-48 overflow-y-auto"
-                        >
-                          {[
-                            "Architecture, Building and Real Estate",
-                            "Business and Administration",
-                            "Education",
-                            "Engineering Sciences",
-                            "Engineering, Manufacturing and Related Trades",
-                            "Fine and Applied Arts",
-                            "Generic Programmes and Qualifications",
-                            "Health Sciences",
-                            "Humanities and Social Sciences",
-                            "Information Technology",
-                            "Law",
-                            "Mass Communication and Information Science",
-                            "Natural, Physical, Chemical and Mathematical Sciences",
-                            "Services",
-                            "Others",
-                          ].map((option) => (
-                            <div key={option} className="flex items-center space-x-2">
-                              <RadioGroupItem value={option} id={option.replace(/[^a-zA-Z0-9]/g, "")} />
-                              <Label htmlFor={option.replace(/[^a-zA-Z0-9]/g, "")} className="text-sm">
-                                {option}
-                              </Label>
-                            </div>
-                          ))}
-                        </RadioGroup>
-
-                        {formData.courseOfStudy === "Others" && (
-                          <div className="ml-6 space-y-2 animate-in slide-in-from-right-2">
-                            <Label htmlFor="otherCourseOfStudy">Please specify your course of study</Label>
-                            <Input
-                              id="otherCourseOfStudy"
-                              value={getValue("otherCourseOfStudy")}
-                              onChange={(e) => updateValue("otherCourseOfStudy", e.target.value)}
-                              placeholder="Enter your course of study"
-                              className="transition-all duration-200 focus:scale-105"
-                            />
-                          </div>
-                        )}
-                      </div>
-                    )}
-
-                    {shouldShowStep("graduationYear") && (
-                      <div className="space-y-2 animate-in slide-in-from-right-2">
-                        <div className="flex items-center gap-2">
-                          {isStepComplete("graduationYear") ? (
-                            <CheckCircle className="w-4 h-4 text-green-500" />
-                          ) : (
-                            <Circle className="w-4 h-4 text-gray-400" />
-                          )}
-                          <Label htmlFor="graduationYear" className="font-medium">
-                            Year of Graduation
-                          </Label>
-                        </div>
-                        <select
-                          id="graduationYear"
-                          value={getValue("graduationYear")}
-                          onChange={(e) => updateValue("graduationYear", e.target.value)}
-                          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
-                        >
-                          <option value="">Select graduation year</option>
-                          {Array.from({ length: 10 }, (_, i) => 2025 + i).map((year) => (
-                            <option key={year} value={year.toString()}>
-                              {year}
-                            </option>
-                          ))}
-                        </select>
-                      </div>
-                    )}
+                {formData.occupation === "Others" && (
+                  <div className="ml-6 space-y-2 animate-in slide-in-from-right-2">
+                    <Label htmlFor="otherOccupation">Please specify your occupation</Label>
+                    <Input
+                      id="otherOccupation"
+                      value={formData.otherOccupation}
+                      onChange={(e) => handleFieldUpdate("otherOccupation", e.target.value)}
+                      placeholder="Enter your occupation"
+                      className="transition-all duration-200 focus:scale-105"
+                    />
                   </div>
                 )}
+              </div>
 
-                {/* Professional-specific sections */}
-                {shouldShowStep("industry") && (
-                  <div className="space-y-4 p-4 bg-purple-50 rounded-lg animate-in slide-in-from-bottom-2">
-                    <div className="space-y-3">
+              {/* Student-specific sections */}
+              {shouldShowStep("school") && (
+                <div className="space-y-4 p-4 bg-blue-50 rounded-lg animate-in slide-in-from-bottom-2">
+                  <div className="space-y-2">
+                    <div className="flex items-center gap-2">
+                      {isStepComplete("school") ? (
+                        <CheckCircle className="w-4 h-4 text-green-500" />
+                      ) : (
+                        <Circle className="w-4 h-4 text-gray-400" />
+                      )}
+                      <Label htmlFor="school" className="font-medium">
+                        School/University
+                      </Label>
+                    </div>
+                    <Input
+                      id="school"
+                      value={formData.school}
+                      onChange={(e) => handleFieldUpdate("school", e.target.value)}
+                      placeholder="Enter your school or university name"
+                      className="transition-all duration-200 focus:scale-105"
+                    />
+                  </div>
+
+                  {shouldShowStep("qualification") && (
+                    <div className="space-y-3 animate-in slide-in-from-right-2">
                       <div className="flex items-center gap-2">
-                        {isStepComplete("industry") ? (
+                        {isStepComplete("qualification") ? (
                           <CheckCircle className="w-4 h-4 text-green-500" />
                         ) : (
                           <Circle className="w-4 h-4 text-gray-400" />
                         )}
-                        <Label className="font-medium">Industry</Label>
+                        <Label className="font-medium">Qualification Currently Pursuing</Label>
                       </div>
                       <RadioGroup
-                        value={getValue("industry")}
-                        onValueChange={(value) => updateValue("industry", value)}
-                        className="space-y-2 max-h-48 overflow-y-auto"
+                        value={formData.qualification}
+                        onValueChange={handleValueChange("qualification")}
+                        className="space-y-2"
                       >
                         {[
-                          "Aerospace & Defense",
-                          "Arts, Entertainment and Hospitality",
-                          "Banking and Finance",
-                          "Built Environment",
-                          "Consumer and Retail",
-                          "Education",
-                          "Energy and Natural Resources",
-                          "Government and Non-profit",
-                          "Healthcare",
-                          "Information and Communication Technology",
-                          "Life Sciences",
-                          "Manufacturing",
-                          "Professional Services",
-                          "Real Estate",
-                          "Social Services",
-                          "Sports",
+                          "Diploma and Other Professional Qualifications",
+                          "Bachelor's or Equivalent",
+                          "Postgraduate Diploma / Certificate (Excluding Master's and Doctorate)",
+                          "Master's and Doctorate or Equivalent",
                           "Others",
                         ].map((option) => (
                           <div key={option} className="flex items-center space-x-2">
@@ -934,137 +907,283 @@ export default function TicketingForm({}: Props) {
                         ))}
                       </RadioGroup>
 
-                      {formData.industry === "Others" && (
+                      {formData.qualification === "Others" && (
                         <div className="ml-6 space-y-2 animate-in slide-in-from-right-2">
-                          <Label htmlFor="otherIndustry">Please specify your industry</Label>
+                          <Label htmlFor="otherQualification">Please specify your qualification</Label>
                           <Input
-                            id="otherIndustry"
-                            value={getValue("otherIndustry")}
-                            onChange={(e) => updateValue("otherIndustry", e.target.value)}
-                            placeholder="Enter your industry"
+                            id="otherQualification"
+                            value={formData.otherQualification}
+                            onChange={(e) => handleFieldUpdate("otherQualification", e.target.value)}
+                            placeholder="Enter your qualification"
                             className="transition-all duration-200 focus:scale-105"
                           />
                         </div>
                       )}
                     </div>
+                  )}
 
-                    {/* Financial Sector (only for Banking and Finance) */}
-                    {shouldShowStep("financialSector") && (
-                      <div className="space-y-3 p-3 bg-blue-50 rounded-lg animate-in slide-in-from-right-2">
-                        <div className="flex items-center gap-2">
-                          {isStepComplete("financialSector") ? (
-                            <CheckCircle className="w-4 h-4 text-green-500" />
-                          ) : (
-                            <Circle className="w-4 h-4 text-gray-400" />
-                          )}
-                          <Label className="font-medium">Financial Sector</Label>
-                        </div>
-                        <RadioGroup
-                          value={getValue("financialSector")}
-                          onValueChange={(value) => updateValue("financialSector", value)}
-                          className="space-y-2"
-                        >
-                          {[
-                            "Asset Management",
-                            "Corporate Banking",
-                            "Enterprise",
-                            "Insurance",
-                            "Investment Banking",
-                            "Private Banking and Wealth Management",
-                            "Retail Banking",
-                          ].map((option) => (
-                            <div key={option} className="flex items-center space-x-2">
-                              <RadioGroupItem value={option} id={option.replace(/[^a-zA-Z0-9]/g, "")} />
-                              <Label htmlFor={option.replace(/[^a-zA-Z0-9]/g, "")} className="text-sm">
-                                {option}
-                              </Label>
-                            </div>
-                          ))}
-                        </RadioGroup>
-                      </div>
-                    )}
-
-                    {/* Job Function */}
-                    {shouldShowStep("jobFunction") && (
-                      <div className="space-y-3 animate-in slide-in-from-right-2">
-                        <div className="flex items-center gap-2">
-                          {isStepComplete("jobFunction") ? (
-                            <CheckCircle className="w-4 h-4 text-green-500" />
-                          ) : (
-                            <Circle className="w-4 h-4 text-gray-400" />
-                          )}
-                          <Label className="font-medium">Job Function</Label>
-                        </div>
-                        <RadioGroup
-                          value={getValue("jobFunction")}
-                          onValueChange={(value) => updateValue("jobFunction", value)}
-                          className="space-y-2 max-h-48 overflow-y-auto"
-                        >
-                          {[
-                            "Accounting",
-                            "Administrative & Human Resources",
-                            "Community and Social Work",
-                            "Consulting, Strategy and Market Research",
-                            "Data Science or Analytics",
-                            "Design",
-                            "Education and Training",
-                            "Engineering",
-                            "Entrepreneurship",
-                            "Finance",
-                            "Healthcare Services",
-                            "Legal",
-                            "Marketing and Communications",
-                            "Operations",
-                            "Product Management",
-                            "Research and Innovation",
-                            "Sales and Business Development",
-                            "Sustainability",
-                            "Technology",
-                            "Others",
-                          ].map((option) => (
-                            <div key={option} className="flex items-center space-x-2">
-                              <RadioGroupItem value={option} id={option.replace(/[^a-zA-Z0-9]/g, "")} />
-                              <Label htmlFor={option.replace(/[^a-zA-Z0-9]/g, "")} className="text-sm">
-                                {option}
-                              </Label>
-                            </div>
-                          ))}
-                        </RadioGroup>
-
-                        {formData.jobFunction === "Others" && (
-                          <div className="ml-6 space-y-2 animate-in slide-in-from-right-2">
-                            <Label htmlFor="otherJobFunction">Please specify your job function</Label>
-                            <Input
-                              id="otherJobFunction"
-                              value={getValue("otherJobFunction")}
-                              onChange={(e) => updateValue("otherJobFunction", e.target.value)}
-                              placeholder="Enter your job function"
-                              className="transition-all duration-200 focus:scale-105"
-                            />
-                          </div>
+                  {shouldShowStep("courseOfStudy") && (
+                    <div className="space-y-3 animate-in slide-in-from-right-2">
+                      <div className="flex items-center gap-2">
+                        {isStepComplete("courseOfStudy") ? (
+                          <CheckCircle className="w-4 h-4 text-green-500" />
+                        ) : (
+                          <Circle className="w-4 h-4 text-gray-400" />
                         )}
+                        <Label className="font-medium">Course of Study</Label>
+                      </div>
+                      <RadioGroup
+                        value={formData.courseOfStudy}
+                        onValueChange={handleValueChange("courseOfStudy")}
+                        className="space-y-2 max-h-48 overflow-y-auto"
+                      >
+                        {[
+                          "Architecture, Building and Real Estate",
+                          "Business and Administration",
+                          "Education",
+                          "Engineering Sciences",
+                          "Engineering, Manufacturing and Related Trades",
+                          "Fine and Applied Arts",
+                          "Generic Programmes and Qualifications",
+                          "Health Sciences",
+                          "Humanities and Social Sciences",
+                          "Information Technology",
+                          "Law",
+                          "Mass Communication and Information Science",
+                          "Natural, Physical, Chemical and Mathematical Sciences",
+                          "Services",
+                          "Others",
+                        ].map((option) => (
+                          <div key={option} className="flex items-center space-x-2">
+                            <RadioGroupItem value={option} id={option.replace(/[^a-zA-Z0-9]/g, "")} />
+                            <Label htmlFor={option.replace(/[^a-zA-Z0-9]/g, "")} className="text-sm">
+                              {option}
+                            </Label>
+                          </div>
+                        ))}
+                      </RadioGroup>
+
+                      {formData.courseOfStudy === "Others" && (
+                        <div className="ml-6 space-y-2 animate-in slide-in-from-right-2">
+                          <Label htmlFor="otherCourseOfStudy">Please specify your course of study</Label>
+                          <Input
+                            id="otherCourseOfStudy"
+                            value={formData.otherCourseOfStudy}
+                            onChange={(e) => handleFieldUpdate("otherCourseOfStudy", e.target.value)}
+                            placeholder="Enter your course of study"
+                            className="transition-all duration-200 focus:scale-105"
+                          />
+                        </div>
+                      )}
+                    </div>
+                  )}
+
+                  {shouldShowStep("graduationYear") && (
+                    <div className="space-y-2 animate-in slide-in-from-right-2">
+                      <div className="flex items-center gap-2">
+                        {isStepComplete("graduationYear") ? (
+                          <CheckCircle className="w-4 h-4 text-green-500" />
+                        ) : (
+                          <Circle className="w-4 h-4 text-gray-400" />
+                        )}
+                        <Label htmlFor="graduationYear" className="font-medium">
+                          Year of Graduation
+                        </Label>
+                      </div>
+                      <select
+                        id="graduationYear"
+                        value={formData.graduationYear}
+                        onChange={(e) => handleFieldUpdate("graduationYear", e.target.value)}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+                      >
+                        <option value="">Select graduation year</option>
+                        {Array.from({ length: 10 }, (_, i) => 2025 + i).map((year) => (
+                          <option key={year} value={year.toString()}>
+                            {year}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {/* Professional-specific sections */}
+              {shouldShowStep("industry") && (
+                <div className="space-y-4 p-4 bg-purple-50 rounded-lg animate-in slide-in-from-bottom-2">
+                  <div className="space-y-3">
+                    <div className="flex items-center gap-2">
+                      {isStepComplete("industry") ? (
+                        <CheckCircle className="w-4 h-4 text-green-500" />
+                      ) : (
+                        <Circle className="w-4 h-4 text-gray-400" />
+                      )}
+                      <Label className="font-medium">Industry</Label>
+                    </div>
+                    <RadioGroup
+                      value={formData.industry}
+                      onValueChange={handleValueChange("industry")}
+                      className="space-y-2 max-h-48 overflow-y-auto"
+                    >
+                      {[
+                        "Aerospace & Defense",
+                        "Arts, Entertainment and Hospitality",
+                        "Banking and Finance",
+                        "Built Environment",
+                        "Consumer and Retail",
+                        "Education",
+                        "Energy and Natural Resources",
+                        "Government and Non-profit",
+                        "Healthcare",
+                        "Information and Communication Technology",
+                        "Life Sciences",
+                        "Manufacturing",
+                        "Professional Services",
+                        "Real Estate",
+                        "Social Services",
+                        "Sports",
+                        "Others",
+                      ].map((option) => (
+                        <div key={option} className="flex items-center space-x-2">
+                          <RadioGroupItem value={option} id={option.replace(/[^a-zA-Z0-9]/g, "")} />
+                          <Label htmlFor={option.replace(/[^a-zA-Z0-9]/g, "")} className="text-sm">
+                            {option}
+                          </Label>
+                        </div>
+                      ))}
+                    </RadioGroup>
+
+                    {formData.industry === "Others" && (
+                      <div className="ml-6 space-y-2 animate-in slide-in-from-right-2">
+                        <Label htmlFor="otherIndustry">Please specify your industry</Label>
+                        <Input
+                          id="otherIndustry"
+                          value={formData.otherIndustry}
+                          onChange={(e) => handleFieldUpdate("otherIndustry", e.target.value)}
+                          placeholder="Enter your industry"
+                          className="transition-all duration-200 focus:scale-105"
+                        />
                       </div>
                     )}
                   </div>
-                )}
-              </CardContent>
-            </Card>
-          )}
 
-          {/* Completion Section */}
-          {shouldShowStep("complete") && (
-            <div className="mt-8">
-              <Card className="border-green-200 bg-gradient-to-r from-green-50 to-emerald-50 animate-in slide-in-from-bottom-4">
-                <CardHeader>
-                  <div className="flex items-center gap-2">
-                    <CheckCircle className="w-5 h-5 text-green-500" />
-                    <CardTitle className="text-green-800">Registration Complete!</CardTitle>
-                  </div>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <p className="text-green-700">
-                    Thank you for joining the Singapore Global Network! Your registration has been completed successfully.
-                  </p>                <div className="bg-white p-4 rounded-lg border border-green-200">
+                  {/* Financial Sector (only for Banking and Finance) */}
+                  {shouldShowStep("financialSector") && (
+                    <div className="space-y-3 p-3 bg-blue-50 rounded-lg animate-in slide-in-from-right-2">
+                      <div className="flex items-center gap-2">
+                        {isStepComplete("financialSector") ? (
+                          <CheckCircle className="w-4 h-4 text-green-500" />
+                        ) : (
+                          <Circle className="w-4 h-4 text-gray-400" />
+                        )}
+                        <Label className="font-medium">Financial Sector</Label>
+                      </div>
+                      <RadioGroup
+                        value={formData.financialSector}
+                        onValueChange={handleValueChange("financialSector")}
+                        className="space-y-2"
+                      >
+                        {[
+                          "Asset Management",
+                          "Corporate Banking",
+                          "Enterprise",
+                          "Insurance",
+                          "Investment Banking",
+                          "Private Banking and Wealth Management",
+                          "Retail Banking",
+                        ].map((option) => (
+                          <div key={option} className="flex items-center space-x-2">
+                            <RadioGroupItem value={option} id={option.replace(/[^a-zA-Z0-9]/g, "")} />
+                            <Label htmlFor={option.replace(/[^a-zA-Z0-9]/g, "")} className="text-sm">
+                              {option}
+                            </Label>
+                          </div>
+                        ))}
+                      </RadioGroup>
+                    </div>
+                  )}
+
+                  {/* Job Function */}
+                  {shouldShowStep("jobFunction") && (
+                    <div className="space-y-3 animate-in slide-in-from-right-2">
+                      <div className="flex items-center gap-2">
+                        {isStepComplete("jobFunction") ? (
+                          <CheckCircle className="w-4 h-4 text-green-500" />
+                        ) : (
+                          <Circle className="w-4 h-4 text-gray-400" />
+                        )}
+                        <Label className="font-medium">Job Function</Label>
+                      </div>
+                      <RadioGroup
+                        value={formData.jobFunction}
+                        onValueChange={handleValueChange("jobFunction")}
+                        className="space-y-2 max-h-48 overflow-y-auto"
+                      >
+                        {[
+                          "Accounting",
+                          "Administrative & Human Resources",
+                          "Community and Social Work",
+                          "Consulting, Strategy and Market Research",
+                          "Data Science or Analytics",
+                          "Design",
+                          "Education and Training",
+                          "Engineering",
+                          "Entrepreneurship",
+                          "Finance",
+                          "Healthcare Services",
+                          "Legal",
+                          "Marketing and Communications",
+                          "Operations",
+                          "Product Management",
+                          "Research and Innovation",
+                          "Sales and Business Development",
+                          "Sustainability",
+                          "Technology",
+                          "Others",
+                        ].map((option) => (
+                          <div key={option} className="flex items-center space-x-2">
+                            <RadioGroupItem value={option} id={option.replace(/[^a-zA-Z0-9]/g, "")} />
+                            <Label htmlFor={option.replace(/[^a-zA-Z0-9]/g, "")} className="text-sm">
+                              {option}
+                            </Label>
+                          </div>
+                        ))}
+                      </RadioGroup>
+
+                      {formData.jobFunction === "Others" && (
+                        <div className="ml-6 space-y-2 animate-in slide-in-from-right-2">
+                          <Label htmlFor="otherJobFunction">Please specify your job function</Label>
+                          <Input
+                            id="otherJobFunction"
+                            value={formData.otherJobFunction}
+                            onChange={(e) => handleFieldUpdate("otherJobFunction", e.target.value)}
+                            placeholder="Enter your job function"
+                            className="transition-all duration-200 focus:scale-105"
+                          />
+                        </div>
+                      )}
+                    </div>
+                  )}
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        )}
+
+        {/* Completion Section */}
+        {shouldShowStep("complete") && (
+          <div className="mt-8">
+            <Card className="border-green-200 bg-gradient-to-r from-green-50 to-emerald-50 animate-in slide-in-from-bottom-4">
+              <CardHeader>
+                <div className="flex items-center gap-2">
+                  <CheckCircle className="w-5 h-5 text-green-500" />
+                  <CardTitle className="text-green-800">Registration Complete!</CardTitle>
+                </div>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <p className="text-green-700">
+                  Thank you for joining the Singapore Global Network! Your registration has been completed successfully.
+                </p>                <div className="bg-white p-4 rounded-lg border border-green-200">
                   <h3 className="font-semibold mb-2 text-green-800">Registration Data:</h3>
                   <pre className="text-xs text-left overflow-auto bg-gray-50 p-2 rounded text-gray-700">
                     {JSON.stringify(formData, null, 2)}
@@ -1293,5 +1412,4 @@ export default function TicketingForm({}: Props) {
       )}
     </div>
   )
-}
 }
