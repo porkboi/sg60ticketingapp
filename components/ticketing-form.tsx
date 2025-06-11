@@ -70,7 +70,7 @@ export default function TicketingForm({}: Props) {
 
   // Add explicit type for onValueChange handlers
   const handleValueChange = (field: keyof FormData) => (value: string) => {
-    handleFieldUpdate(field, value)
+    handleSingleFieldUpdate(field, value)
   }
 
   // Add explicit type for onCheckedChange handlers
@@ -89,7 +89,7 @@ export default function TicketingForm({}: Props) {
       case "intro":
         return formData[`${currentPersonIndex}.acknowledgedIntro`]
       case "salutation":
-        return formData[`${currentPersonIndex}.salutation`] !== ""
+        return formData[`${currentPersonIndex}.salutation`] !== null
       case "firstName":
         return formData[`${currentPersonIndex}.firstName`]?.trim() !== ""
       case "lastName":
