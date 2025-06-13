@@ -96,7 +96,7 @@ export default function TicketingForm({}: Props) {
     return formData.adultTickets * 50 + formData.childTickets * 25
   }
 
-  const isStepComplete = (idx : number, step: string) => {
+  const isStepComplete = (idx: number, step: string) => {
     switch (step) {
       case "tickets":
         return formData.adultTickets >= 1 || formData.childTickets >= 1
@@ -161,12 +161,32 @@ export default function TicketingForm({}: Props) {
           (formData[`${currentPersonIndex}.jobFunction`] !== "" &&
             (formData[`${currentPersonIndex}.jobFunction`] !== "Others" || formData[`${currentPersonIndex}.otherJobFunction`]?.trim() !== ""))
         )
+      case "specialization":
+        return formData[`${currentPersonIndex}.jobFunction`] !== "Technology" || 
+               formData[`${currentPersonIndex}.specialization`] !== ""
+      case "jobLevel":
+        return formData[`${currentPersonIndex}.jobLevel`] !== ""
+      case "jobTitle":
+        return formData[`${currentPersonIndex}.jobTitle`]?.trim() !== ""
+      case "companyName":
+        return formData[`${currentPersonIndex}.companyName`]?.trim() !== ""
+      case "employmentStatus":
+        return formData[`${currentPersonIndex}.occupation`] !== "Others" || 
+               formData[`${currentPersonIndex}.employmentStatus`] !== ""
+      case "employmentDescription":
+        return formData[`${currentPersonIndex}.employmentStatus`] === "No" ||
+               formData[`${currentPersonIndex}.employmentDescription`] !== "" 
+      case "otherEmploymentDescription":
+        return formData[`${currentPersonIndex}.employmentDescription`] !== "Other" ||
+               formData[`${currentPersonIndex}.otherEmploymentDescription`]?.trim() !== ""
+      case "privacyConsent":
+        return formData[`${currentPersonIndex}.privacyConsent`] === true
       default:
         return false
     }
   }
 
-  const shouldShowStep = (idx : number, step: string) => {
+  const shouldShowStep = (idx: number, step: string) => {
     switch (step) {
       case "tickets":
         return true
@@ -232,6 +252,17 @@ export default function TicketingForm({}: Props) {
               (formData[`${currentPersonIndex}.industry`] !== "Banking and Finance" || isStepComplete(currentPersonIndex, "financialSector")) &&
               isStepComplete(currentPersonIndex, "jobFunction")))
         )
+      case "employmentStatus":
+        return formData[`${currentPersonIndex}.occupation`] !== "Others" || 
+               formData[`${currentPersonIndex}.employmentStatus`] !== ""
+      case "employmentDescription":
+        return formData[`${currentPersonIndex}.employmentStatus`] === "No" ||
+               formData[`${currentPersonIndex}.employmentDescription`] !== "" 
+      case "otherEmploymentDescription":
+        return formData[`${currentPersonIndex}.employmentDescription`] !== "Other" ||
+               formData[`${currentPersonIndex}.otherEmploymentDescription`]?.trim() !== ""
+      case "privacyConsent":
+        return formData[`${currentPersonIndex}.privacyConsent`] === true
       default:
         return false
     }
@@ -1097,8 +1128,209 @@ export default function TicketingForm({}: Props) {
                       )}
                     </div>
                   )}
+
+                  {/* Technology Specialization */}
+                  {shouldShowStep(currentPersonIndex, "specialization") && (
+                    <div className="space-y-3 animate-in slide-in-from-right-2">
+                      <div className="flex items-center gap-2">
+                        {isStepComplete(currentPersonIndex, "specialization") ? (
+                          <CheckCircle className="w-4 h-4 text-green-500" />
+                        ) : (
+                          <Circle className="w-4 h-4 text-gray-400" />
+                        )}
+                        <Label className="font-medium">Area of Specialization</Label>
+                      </div>
+                      <RadioGroup
+                        value={formData[`${currentPersonIndex}.specialization`]
+                        }
+                        onValueChange={handleValueChange("specialization")}
+                        className="space-y-2"
+                      >
+                        {[
+                          "Artificial Intelligence",
+                          "Block Chain",
+                          "Cloud Computing",
+                          "Cybersecurity",
+                          "Network Engineering",
+                          "Robotics",
+                          "Software Development",
+                          "Systems Administration",
+                          "Web or Application Development"
+                        ].map((option) => (
+                          <div key={option} className="flex items-center space-x-2">
+                            <RadioGroupItem value={option} id={option.replace(/[^a-zA-Z0-9]/g, "")} />
+                            <Label htmlFor={option.replace(/[^a-zA-Z0-9]/g, "")} className="text-sm">
+                              {option}
+                            </Label>
+                          </div>
+                        ))}
+                      </RadioGroup>
+                    </div>
+                  )}
+
+                  {/* Job Level */}
+                  {shouldShowStep(currentPersonIndex, "jobLevel") && (
+                    <div className="space-y-3 animate-in slide-in-from-right-2">
+                      <div className="flex items-center gap-2">
+                        {isStepComplete(currentPersonIndex, "jobLevel") ? (
+                          <CheckCircle className="w-4 h-4 text-green-500" />
+                        ) : (
+                          <Circle className="w-4 h-4 text-gray-400" />
+                        )}
+                        <Label className="font-medium">Job Level/Title</Label>
+                      </div>
+                      <RadioGroup
+                        value={formData[`${currentPersonIndex}.jobLevel`]}
+                        onValueChange={handleValueChange("jobLevel")}
+                        className="space-y-2"
+                      >
+                        {[
+                          "C-Suite",
+                          "EVP/ SVP/ VP/ Director/ Lead Specialist",
+                          "Manager/ Senior Specialist",
+                          "Associate/ Executive/ Junior Specialist"
+                        ].map((option) => (
+                          <div key={option} className="flex items-center space-x-2">
+                            <RadioGroupItem value={option} id={option.replace(/[^a-zA-Z0-9]/g, "")} />
+                            <Label htmlFor={option.replace(/[^a-zA-Z0-9]/g, "")} className="text-sm">
+                              {option}
+                            </Label>
+                          </div>
+                        ))}
+                      </RadioGroup>
+                    </div>
+                  )}
+
+                  {/* Job Title */}
+                  {shouldShowStep(currentPersonIndex, "jobTitle") && (
+                    <div className="space-y-3 animate-in slide-in-from-right-2">
+                      <div className="flex items-center gap-2">
+                        {isStepComplete(currentPersonIndex, "jobTitle") ? (
+                          <CheckCircle className="w-4 h-4 text-green-500" />
+                        ) : (
+                          <Circle className="w-4 h-4 text-gray-400" />
+                        )}
+                        <Label className="font-medium">Job Title</Label>
+                      </div>
+                      <Input
+                        id="jobTitle"
+                        value={formData[`${currentPersonIndex}.jobTitle`]}
+                        onChange={(e) => handleFieldUpdate("jobTitle", e.target.value)}
+                        placeholder="Enter your job title"
+                        className="transition-all duration-200 focus:scale-105"
+                      />
+                    </div>
+                  )}
+
+                  {/* Company Name */}
+                  {shouldShowStep(currentPersonIndex, "companyName") && (
+                    <div className="space-y-3 animate-in slide-in-from-right-2">
+                      <div className="flex items-center gap-2">
+                        {isStepComplete(currentPersonIndex, "companyName") ? (
+                          <CheckCircle className="w-4 h-4 text-green-500" />
+                        ) : (
+                          <Circle className="w-4 h-4 text-gray-400" />
+                        )}
+                        <Label className="font-medium">Company Name</Label>
+                      </div>
+                      <Input
+                        id="companyName"
+                        value={formData[`${currentPersonIndex}.companyName`]}
+                        onChange={(e) => handleFieldUpdate("companyName", e.target.value)}
+                        placeholder="Enter your company name"
+                        className="transition-all duration-200 focus:scale-105"
+                      />
+                    </div>
+                  )}
                 </div>
               )}
+            </CardContent>
+          </Card>
+        )}
+
+        {/* Employment Section - Shown only if occupation is "Others" */}
+        {formData[`${currentPersonIndex}.occupation`] === "Others" && (
+          <div className="space-y-4 p-4 bg-purple-50 rounded-lg animate-in slide-in-from-bottom-2">
+            {/* Employment Status */}
+            <div className="space-y-3">
+              <Label className="font-medium">Are you currently employed?</Label>
+              <RadioGroup
+                value={formData[`${currentPersonIndex}.employmentStatus`]}
+                onValueChange={handleValueChange("employmentStatus")}
+                className="space-y-2"
+              >
+                {["Yes Part time", "Yes Full time", "No"].map((option) => (
+                  <div key={option} className="flex items-center space-x-2">
+                    <RadioGroupItem value={option} id={option.replace(/[^a-zA-Z0-9]/g, "")} />
+                    <Label htmlFor={option.replace(/[^a-zA-Z0-9]/g, "")}>{option}</Label>
+                  </div>
+                ))}
+              </RadioGroup>
+            </div>
+
+            {/* Employment Description */}
+            {shouldShowStep(currentPersonIndex, "employmentDescription") && (
+              <div className="space-y-3">
+                <Label className="font-medium">Which best describes you?</Label>
+                <RadioGroup
+                  value={formData[`${currentPersonIndex}.employmentDescription`]}
+                  onValueChange={handleValueChange("employmentDescription")}
+                  className="space-y-2"
+                >
+                  {["Freelancer", "Retiree", "Homemaker", "In Transition or Job Searching", "Other"].map((option) => (
+                    <div key={option} className="flex items-center space-x-2">
+                      <RadioGroupItem value={option} id={option.replace(/[^a-zA-Z0-9]/g, "")} />
+                      <Label htmlFor={option.replace(/[^a-zA-Z0-9]/g, "")}>{option}</Label>
+                    </div>
+                  ))}
+                </RadioGroup>
+
+                {formData[`${currentPersonIndex}.employmentDescription`] === "Other" && (
+                  <div className="ml-6 space-y-2 animate-in slide-in-from-right-2">
+                    <Input
+                      value={formData[`${currentPersonIndex}.otherEmploymentDescription`]}
+                      onChange={(e) => handleFieldUpdate("otherEmploymentDescription", e.target.value)}
+                      placeholder="Please specify"
+                      className="transition-all duration-200 focus:scale-105"
+                    />
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* Privacy Consent - Add just before the final completion card */}
+        {shouldShowStep(currentPersonIndex, "privacyConsent") && (
+          <Card className="mt-4 border-blue-200 bg-gradient-to-r from-blue-50 to-blue-100">
+            <CardContent className="pt-6 space-y-4">
+              <div className="text-sm text-gray-700 space-y-4">
+                <p>
+                  To continue receiving news of events like this, the Singapore Global Network warmly invites you to be a part of our vibrant and exciting global network of family, friends and fans of Singapore.
+                </p>
+                <p>
+                  Apart from e-newsletters, SGN organises regular social and professional get-togethers and events in various cities around the world.
+                </p>
+              </div>
+              <div className="flex items-center space-x-2">
+                <Checkbox
+                  id="privacyConsent"
+                  checked={formData[`${currentPersonIndex}.privacyConsent`] || false}
+                  onCheckedChange={(checked) => handleFieldUpdate("privacyConsent", checked)}
+                />
+                <Label htmlFor="privacyConsent" className="text-sm">
+                  To continue receiving news of events like this, the Singapore Global Network warmly invites you to be a part of our vibrant and exciting global network of family, friends and fans of Singapore. Apart from e-newsletters, SGN organises regular social and professional get-togethers and events in various cities around the world. Please tick the checkbox below to join our mailing list and confirm you agree to our privacy statement at
+                  <a 
+                    href="https://singaporeglobalnetwork.gov.sg/privacy-statement/" 
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-blue-600 hover:underline"
+                  >
+                    https://singaporeglobalnetwork.gov.sg/privacy-statement/
+                  </a>
+                  I have read and understood Singapore Global Network's Privacy Statement, and agree to receive updates and exclusive invitations from Singapore Global Network.
+                </Label>
+              </div>
             </CardContent>
           </Card>
         )}
@@ -1146,7 +1378,7 @@ export default function TicketingForm({}: Props) {
         <CardHeader className="pb-4">
           <div className="flex items-center justify-between">
             <CardTitle className="text-lg">
-              {formData.proceedToRegistration} ? "Registration Progress" : "Ticket Selection"}
+              {formData.proceedToRegistration ? "Registration Progress" : "Ticket Selection"}
             </CardTitle>
             <Badge className="bg-blue-100 text-blue-800">
               {getCompletedSteps()} / {getTotalSteps()} Complete
