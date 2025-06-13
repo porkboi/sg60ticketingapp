@@ -88,6 +88,10 @@ export default function TicketingForm({}: Props) {
     handleSingleFieldUpdate(field, checked)
   }
 
+  const handleSingleCheckedChange = (field: keyof FormData) => (checked: boolean) => {
+    handleFieldUpdate(field, checked)
+  }
+
   const getTotalCost = () => {
     return formData.adultTickets * 50 + formData.childTickets * 25
   }
@@ -621,7 +625,7 @@ export default function TicketingForm({}: Props) {
                     <Checkbox
                       id="isPR"
                       checked={formData[`${currentPersonIndex}.isPermanentResident`] || false}
-                      onCheckedChange={handleCheckedChange("isPermanentResident")}
+                      onCheckedChange={handleSingleCheckedChange("isPermanentResident")}
                     />
                     <Label htmlFor="isPR" className="text-sm">
                       Yes, I am a Singaporean Permanent Resident
