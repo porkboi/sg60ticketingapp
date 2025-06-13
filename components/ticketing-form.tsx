@@ -177,7 +177,7 @@ export default function TicketingForm({}: Props) {
         return formData[`${currentPersonIndex}.employmentStatus`] === "No" ||
                formData[`${currentPersonIndex}.employmentDescription`] !== "" 
       case "otherEmploymentDescription":
-        return formData[`${currentPersonIndex}.employmentDescription`] !== "Other" ||
+        return formData[`${currentPersonIndex}.employmentDescription`] === "Other" ||
                formData[`${currentPersonIndex}.otherEmploymentDescription`]?.trim() !== ""
       case "privacyConsent":
         return formData[`${currentPersonIndex}.privacyConsent`] === true
@@ -252,10 +252,7 @@ export default function TicketingForm({}: Props) {
         return formData[`${currentPersonIndex}.employmentDescription`] !== "Other" ||
                formData[`${currentPersonIndex}.otherEmploymentDescription`]?.trim() !== ""
       case "privacyConsent":
-        console.log(isStepComplete(currentPersonIndex, "employmentDescription"))
-        //console.log(isStepComplete(currentPersonIndex, "otherEmploymentDescription"))
-        console.log(isStepComplete(currentPersonIndex, "graduationYear"))
-        return isStepComplete(currentPersonIndex, "employmentDescription") || isStepComplete(currentPersonIndex, "graduationYear")
+        return isStepComplete(currentPersonIndex, "employmentDescription") || isStepComplete(currentPersonIndex, "otherEmploymentDescription") || isStepComplete(currentPersonIndex, "graduationYear")
       case "specialization":
         return isStepComplete(currentPersonIndex, "jobFunction")
         default:
@@ -1315,7 +1312,7 @@ export default function TicketingForm({}: Props) {
                   >
                     https://singaporeglobalnetwork.gov.sg/privacy-statement/
                   </a>
-                  I have read and understood Singapore Global Network's Privacy Statement, and agree to receive updates and exclusive invitations from Singapore Global Network.
+                   I have read and understood Singapore Global Network's Privacy Statement, and agree to receive updates and exclusive invitations from Singapore Global Network.
                 </Label>
               </div>
             </CardContent>
@@ -1329,27 +1326,50 @@ export default function TicketingForm({}: Props) {
               <CardHeader>
                 <div className="flex items-center gap-2">
                   <CheckCircle className="w-5 h-5 text-green-500" />
-                  <CardTitle className="text-green-800">Registration Complete!</CardTitle>
+                  <CardTitle className="text-green-800">
+                    {currentPersonIndex === adultTickets + childTickets - 1 
+                      ? "All Registrations Complete!" 
+                      : "Section Complete!"}
+                  </CardTitle>
                 </div>
               </CardHeader>
               <CardContent className="space-y-4">
-                <p className="text-green-700">
-                  Thank you for joining the Singapore Global Network! Your registration has been completed successfully.
-                </p>                <div className="bg-white p-4 rounded-lg border border-green-200">
-                  <h3 className="font-semibold mb-2 text-green-800">Registration Data:</h3>
-                  <pre className="text-xs text-left overflow-auto bg-gray-50 p-2 rounded text-gray-700">
-                    {JSON.stringify(formData, null, 2)}
-                  </pre>
-                </div>
-
-                <div className="flex gap-2">                  <Button className="flex-1 bg-green-600 hover:bg-green-700">Submit Registration</Button>
-                  <Button
-                    className="border-green-300 text-green-700 hover:bg-green-50"
-                    onClick={() => dispatch(resetForm())}
-                  >
-                    Start Over
-                  </Button>
-                </div>
+                {currentPersonIndex === adultTickets + childTickets - 1 ? (
+                  <>
+                    <p className="text-green-700">
+                      Thank you for completing all registrations! Please review your submission below.
+                    </p>
+                    <div className="bg-white p-4 rounded-lg border border-green-200">
+                      <h3 className="font-semibold mb-2 text-green-800">Registration Data:</h3>
+                      <pre className="text-xs text-left overflow-auto bg-gray-50 p-2 rounded text-gray-700">
+                        {JSON.stringify(formData, null, 2)}
+                      </pre>
+                    </div>
+                    <div className="flex gap-2">
+                      <Button className="flex-1 bg-green-600 hover:bg-green-700">
+                        Submit All Registrations
+                      </Button>
+                      <Button
+                        className="border-green-300 text-green-700 hover:bg-green-50"
+                        onClick={() => dispatch(resetForm())}
+                      >
+                        Start Over
+                      </Button>
+                    </div>
+                  </>
+                ) : (
+                  <div className="space-y-4">
+                    <p className="text-green-700">
+                      Great! You've completed this section. Ready to move on to the next person?
+                    </p>
+                    <Button 
+                      className="w-full bg-blue-600 hover:bg-blue-700"
+                      onClick={() => setCurrentPersonIndex(currentPersonIndex + 1)}
+                    >
+                      Next Person
+                    </Button>
+                  </div>
+                )}
               </CardContent>
             </Card>
           </div>
