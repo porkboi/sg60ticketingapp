@@ -253,9 +253,9 @@ export default function TicketingForm({}: Props) {
                formData[`${currentPersonIndex}.otherEmploymentDescription`]?.trim() !== ""
       case "privacyConsent":
         console.log(isStepComplete(currentPersonIndex, "employmentDescription"))
-        console.log(isStepComplete(currentPersonIndex, "otherEmploymentDescription"))
+        //console.log(isStepComplete(currentPersonIndex, "otherEmploymentDescription"))
         console.log(isStepComplete(currentPersonIndex, "graduationYear"))
-        return isStepComplete(currentPersonIndex, "employmentDescription") || isStepComplete(currentPersonIndex, "otherEmploymentDescription") || isStepComplete(currentPersonIndex, "graduationYear")
+        return isStepComplete(currentPersonIndex, "employmentDescription") || isStepComplete(currentPersonIndex, "graduationYear")
       case "specialization":
         return isStepComplete(currentPersonIndex, "jobFunction")
         default:
