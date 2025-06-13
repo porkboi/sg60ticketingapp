@@ -162,7 +162,7 @@ export default function TicketingForm({}: Props) {
             (formData[`${currentPersonIndex}.jobFunction`] !== "Others" || formData[`${currentPersonIndex}.otherJobFunction`]?.trim() !== ""))
         )
       case "specialization":
-        return formData[`${currentPersonIndex}.jobFunction`] !== "Technology" || 
+        return formData[`${currentPersonIndex}.jobFunction`] === "Technology" || 
                formData[`${currentPersonIndex}.specialization`] !== ""
       case "jobLevel":
         return formData[`${currentPersonIndex}.jobLevel`] !== ""
@@ -254,8 +254,8 @@ export default function TicketingForm({}: Props) {
       case "privacyConsent":
         return isStepComplete(currentPersonIndex, "employmentDescription") || isStepComplete(currentPersonIndex, "otherEmploymentDescription") || isStepComplete(currentPersonIndex, "graduationYear")
       case "specialization":
-        return isStepComplete(currentPersonIndex, "jobFunction")
-        default:
+        return isStepComplete(currentPersonIndex, "jobFunction") && formData[`${currentPersonIndex}.jobFunction`] === "Technology"
+      default:
         return false
     }
   }
