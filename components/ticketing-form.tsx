@@ -108,7 +108,7 @@ export default function TicketingForm({}: Props) {
         return formData[`${currentPersonIndex}.email`]?.trim() !== "" && formData[`${currentPersonIndex}.email`]?.includes("@")
       case "nationality":
         return (
-          formData[`${currentPersonIndex}.nationality`] !== "" &&
+          formData[`${currentPersonIndex}.nationality`] !== "" ||
           (formData[`${currentPersonIndex}.nationality`] === "Singapore" || formData[`${currentPersonIndex}.otherNationality`]?.trim() !== "")
         )
       case "pr":
