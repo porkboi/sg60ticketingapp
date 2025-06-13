@@ -145,7 +145,7 @@ export default function TicketingForm({}: Props) {
             (formData[`${currentPersonIndex}.courseOfStudy`] !== "Others" || formData[`${currentPersonIndex}.otherCourseOfStudy`]?.trim() !== ""))
         )
       case "graduationYear":
-        return formData[`${currentPersonIndex}.occupation`] !== "Student" || formData[`${currentPersonIndex}.graduationYear`] !== ""
+        return formData[`${currentPersonIndex}.occupation`] === "Student" && formData[`${currentPersonIndex}.graduationYear`] !== ""
       case "industry":
         return (
           (formData[`${currentPersonIndex}.occupation`] !== "Working Professional" &&
@@ -1296,14 +1296,6 @@ export default function TicketingForm({}: Props) {
         {shouldShowStep(currentPersonIndex, "privacyConsent") && (
           <Card className="mt-4 border-blue-200 bg-gradient-to-r from-blue-50 to-blue-100">
             <CardContent className="pt-6 space-y-4">
-              <div className="text-sm text-gray-700 space-y-4">
-                <p>
-                  To continue receiving news of events like this, the Singapore Global Network warmly invites you to be a part of our vibrant and exciting global network of family, friends and fans of Singapore.
-                </p>
-                <p>
-                  Apart from e-newsletters, SGN organises regular social and professional get-togethers and events in various cities around the world.
-                </p>
-              </div>
               <div className="flex items-center space-x-2">
                 <Checkbox
                   id="privacyConsent"
@@ -1311,7 +1303,7 @@ export default function TicketingForm({}: Props) {
                   onCheckedChange={(checked) => handleFieldUpdate("privacyConsent", checked)}
                 />
                 <Label htmlFor="privacyConsent" className="text-sm">
-                  To continue receiving news of events like this, the Singapore Global Network warmly invites you to be a part of our vibrant and exciting global network of family, friends and fans of Singapore. Apart from e-newsletters, SGN organises regular social and professional get-togethers and events in various cities around the world. Please tick the checkbox below to join our mailing list and confirm you agree to our privacy statement at
+                  To continue receiving news of events like this, the Singapore Global Network warmly invites you to be a part of our vibrant and exciting global network of family, friends and fans of Singapore. Apart from e-newsletters, SGN organises regular social and professional get-togethers and events in various cities around the world. Please tick the checkbox below to join our mailing list and confirm you agree to our privacy statement at 
                   <a 
                     href="https://singaporeglobalnetwork.gov.sg/privacy-statement/" 
                     target="_blank"
