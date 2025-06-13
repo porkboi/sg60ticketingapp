@@ -240,17 +240,7 @@ export default function TicketingForm({}: Props) {
         )
       case "complete":
         return (
-          isStepComplete(currentPersonIndex, "occupation") &&
-          (formData[`${currentPersonIndex}.occupation`] !== "Student" ||
-            (isStepComplete(currentPersonIndex, "school") &&
-              isStepComplete(currentPersonIndex, "qualification") &&
-              isStepComplete(currentPersonIndex, "courseOfStudy") &&
-              isStepComplete(currentPersonIndex, "graduationYear"))) &&
-          ((formData[`${currentPersonIndex}.occupation`] !== "Working Professional" &&
-            formData[`${currentPersonIndex}.occupation`] !== "Business Owner and Entrepreneur") ||
-            (isStepComplete(currentPersonIndex, "industry") &&
-              (formData[`${currentPersonIndex}.industry`] !== "Banking and Finance" || isStepComplete(currentPersonIndex, "financialSector")) &&
-              isStepComplete(currentPersonIndex, "jobFunction")))
+          isStepComplete(currentPersonIndex, "privacyConsent")
         )
       case "employmentStatus":
         return formData[`${currentPersonIndex}.occupation`] !== "Others" || 
