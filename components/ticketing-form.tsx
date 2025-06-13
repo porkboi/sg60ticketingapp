@@ -185,7 +185,7 @@ export default function TicketingForm({}: Props) {
       case "pr":
         return isStepComplete(currentPersonIndex,"nationality") && formData[`${currentPersonIndex}.nationality`] === "Others"
       case "country":
-        return isStepComplete(currentPersonIndex, "nationality") && (formData[`${currentPersonIndex}.nationality`] == "Others" && isStepComplete(currentPersonIndex, "pr"))
+        return isStepComplete(currentPersonIndex, "nationality") || (formData[`${currentPersonIndex}.nationality`] == "Others" && isStepComplete(currentPersonIndex, "pr"))
       case "state":
         return isStepComplete(currentPersonIndex, "country") && formData[`${currentPersonIndex}.countryOfResidence`] === "United States of America"
       case "city":
