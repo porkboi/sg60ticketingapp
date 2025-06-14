@@ -343,32 +343,7 @@ export default function TicketingForm({}: Props) {
     return true
   }
 
-  // Update the form completion logic to show the dialog
-  useEffect(() => {
-    if (areAllFormsComplete()) {
-      setShowCompletion(true)
-    }
-  }, [formData])
-
-  // Modify the effect to add completed registrations
-  useEffect(() => {
-    if (isFormComplete(currentPersonIndex)) {
-      const registrationData = currentPersonIndex < adultTickets 
-        ? formData[`${currentPersonIndex}.adultForms`]?.[currentPersonIndex]
-        : formData[`${currentPersonIndex}.childForms`]?.[currentPersonIndex - adultTickets]
-      
-      dispatch(addRegistration({
-        id: `${currentPersonIndex}-${Date.now()}`,
-        type: currentPersonIndex < adultTickets ? "adult" : "child",
-        data: registrationData,
-        timestamp: Date.now()
-      }))
-
-      if (currentPersonIndex === adultTickets + childTickets - 1) {
-        setShowCompletion(true)
-      }
-    }
-  }, [formData, currentPersonIndex])
+  
 
   const renderConsolidatedForm = () => (
     <Card className="mt-8">
