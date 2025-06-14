@@ -1578,17 +1578,10 @@ export default function TicketingForm({}: Props) {
                 }
                 placeholder="Contact Number"
               />
-              {!formData.discount && 
-              formData[`${currentPersonIndex}.contactNumber`] && 
-              currentPersonIndex < (adultTickets + childTickets - 1) && (
+              {currentPersonIndex < (adultTickets + childTickets - 1) && (
                 <Button 
                   className="w-full bg-blue-600 hover:bg-blue-700 mt-4"
-                  onClick={() => {
-                    // Use setTimeout to prevent state update during render
-                    setTimeout(() => {
-                      setCurrentPersonIndex(currentPersonIndex + 1)
-                    }, 0)
-                  }}
+                  onClick={() => setCurrentPersonIndex(currentPersonIndex + 1)}
                 >
                   Next Person
                 </Button>
