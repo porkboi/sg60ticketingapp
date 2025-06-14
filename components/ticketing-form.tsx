@@ -1378,6 +1378,48 @@ export default function TicketingForm({}: Props) {
     </Card>
   )
 
+  const renderSmallForm = () => (
+    <Card className="mt-8">
+      <CardHeader>
+        <CardTitle>Registrant Information</CardTitle>
+      </CardHeader>
+      <CardContent className="space-y-4">
+        <Input
+          id="firstName"
+          value={formData[`${currentPersonIndex}.firstName`] || ''}
+          onChange={(e: ChangeEvent<HTMLInputElement>) => 
+            handleFieldUpdate(`firstName`, e.target.value)
+          }
+          placeholder="First Name"
+        />
+        <Input
+          id="lastName"
+          value={formData[`${currentPersonIndex}.lastName`] || ''}
+          onChange={(e: ChangeEvent<HTMLInputElement>) => 
+            handleFieldUpdate(`lastName`, e.target.value)
+          }
+          placeholder="Last Name"
+        />
+        <Input
+          id="email"
+          value={formData[`${currentPersonIndex}.email`] || ''}
+          onChange={(e: ChangeEvent<HTMLInputElement>) => 
+            handleFieldUpdate(`email`, e.target.value)
+          }
+          placeholder="Email Address"
+        />
+        <Input
+          id="contactNumber"
+          value={formData[`${currentPersonIndex}.contactNumber`] || ''}
+          onChange={(e: ChangeEvent<HTMLInputElement>) => 
+            handleFieldUpdate(`contactNumber`, e.target.value)
+          }
+          placeholder="Contact Number"
+        />
+      </CardContent>
+    </Card>
+  )
+
   return (
     <div className="space-y-6">
       {/* Progress Header */}
@@ -1541,53 +1583,15 @@ export default function TicketingForm({}: Props) {
       {formData.proceedToRegistration && !formData.discount && (
         <div className="my-8">
           {renderBubbles()}
-          <Card className="mt-8">
-            <CardHeader>
-              <CardTitle>Registrant Information</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <Input
-                id="firstName"
-                value={formData[`${currentPersonIndex}.firstName`] || ''}
-                onChange={(e: ChangeEvent<HTMLInputElement>) => 
-                  handleFieldUpdate(`firstName`, e.target.value)
-                }
-                placeholder="First Name"
-              />
-              <Input
-                id="lastName"
-                value={formData[`${currentPersonIndex}.lastName`] || ''}
-                onChange={(e: ChangeEvent<HTMLInputElement>) => 
-                  handleFieldUpdate(`lastName`, e.target.value)
-                }
-                placeholder="Last Name"
-              />
-              <Input
-                id="email"
-                value={formData[`${currentPersonIndex}.email`] || ''}
-                onChange={(e: ChangeEvent<HTMLInputElement>) => 
-                  handleFieldUpdate(`email`, e.target.value)
-                }
-                placeholder="Email Address"
-              />
-              <Input
-                id="contactNumber"
-                value={formData[`${currentPersonIndex}.contactNumber`] || ''}
-                onChange={(e: ChangeEvent<HTMLInputElement>) => 
-                  handleFieldUpdate(`contactNumber`, e.target.value)
-                }
-                placeholder="Contact Number"
-              />
-              {currentPersonIndex < (adultTickets + childTickets - 1) && (
-                <Button 
-                  className="w-full bg-blue-600 hover:bg-blue-700 mt-4"
-                  onClick={() => setCurrentPersonIndex(currentPersonIndex + 1)}
-                >
-                  Next Person
-                </Button>
-              )}
-            </CardContent>
-          </Card>
+          {renderSmallForm()}
+          {formData.contactNumber != "" && currentPersonIndex < (adultTickets + childTickets - 1) && (
+            <Button 
+              className="w-full bg-blue-600 hover:bg-blue-700 mt-4"
+              onClick={() => setCurrentPersonIndex(currentPersonIndex + 1)}
+            >
+              Next Person
+            </Button>
+          )}
         </div>
       )}
     </div>
