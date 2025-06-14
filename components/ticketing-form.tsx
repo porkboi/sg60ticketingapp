@@ -1570,7 +1570,7 @@ export default function TicketingForm({}: Props) {
                 onChange={(e: ChangeEvent<HTMLInputElement>) => handleFieldUpdate("contactNumber", e.target.value)}
                 placeholder="Contact Number"
               />
-              {formData[`${currentPersonIndex}.contactNumber`] !== "" && currentPersonIndex < (adultTickets + childTickets - 1) && (
+              {formData[`${currentPersonIndex}.contactNumber`] === "" && currentPersonIndex < (adultTickets + childTickets - 1) && (
                 <Button 
                   className="w-full bg-blue-600 hover:bg-blue-700 mt-4"
                   onClick={() => setCurrentPersonIndex(currentPersonIndex + 1)}
