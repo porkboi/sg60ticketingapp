@@ -1,253 +1,160 @@
-import { createSlice, type PayloadAction } from "@reduxjs/toolkit"
+import { createSlice, PayloadAction } from "@reduxjs/toolkit"
 
 export interface FormData {
-  [key: string]: any; // Allow dynamic indexed fields
-  adultTickets: number;
-  childTickets: number;
-  discount: boolean;
-  proceedToRegistration: boolean;
+  // Ticket selection
+  adultTickets: number
+  childTickets: number
+  proceedToRegistration: boolean
+  discount: boolean
+
+  // Dynamic fields for each registrant
+  [key: string]: any // Allows for dynamic field names like "0.firstName", "1.email", etc.
+}
+
+export interface FormSchema {
+  fields: {
+    [key: string]: {
+      type: string
+      required: boolean
+      options?: string[]
+    }
+  }
 }
 
 export interface FormState {
-  currentStep: number
   formData: FormData
-  schema: Record<string, any>
-  adultForms: FormData[]
-  childForms: FormData[]
+  schema: FormSchema
+  errors: { [key: string]: string }
 }
 
-const initialAdultForm: FormData = {  // Adding FormData properties
-  adultTickets: 1,
-  childTickets: 0,
-  proceedToRegistration: false,
-  discount: false,
-  adultForms: [],
-  childForms: [],
-  salutation: "",
-  firstName: "",
-  lastName: "",
-  email: "",
-  nationality: "",
-  otherNationality: "",
-  isPermanentResident: false,
-  countryOfResidence: "",
-  otherCountryResidence: "",
-  stateOfResidence: "",
-  cityOfResidence: "",
-  occupation: "",
-  otherOccupation: "",
-  school: "",
-  qualification: "",
-  otherQualification: "",
-  courseOfStudy: "",
-  otherCourseOfStudy: "",
-  graduationYear: "",
-  industry: "",
-  otherIndustry: "",
-  financialSector: "",
-  jobFunction: "",
-  otherJobFunction: "",
-  contactNumber: ""
-};
-
-const initialChildForm: FormData = {  // Adding FormData properties
-  adultTickets: 0,
-  childTickets: 1,
-  proceedToRegistration: false,
-  discount: false,
-  adultForms: [],
-  childForms: [],
-  salutation: "",
-  firstName: "",
-  lastName: "",
-  email: "",
-  nationality: "",
-  otherNationality: "",
-  isPermanentResident: false,
-  countryOfResidence: "",
-  otherCountryResidence: "",
-  stateOfResidence: "",
-  cityOfResidence: "",
-  occupation: "Student",
-  otherOccupation: "",
-  school: "",
-  qualification: "",
-  otherQualification: "",
-  courseOfStudy: "",
-  otherCourseOfStudy: "",
-  graduationYear: "",
-  industry: "",
-  otherIndustry: "",
-  financialSector: "",
-  jobFunction: "",
-  otherJobFunction: "",
-  contactNumber: ""
-};
-
 const initialState: FormState = {
-  currentStep: 1,
   formData: {
-    ...initialAdultForm,
     adultTickets: 1,
     childTickets: 0,
     proceedToRegistration: false,
-    discount: false,
-    adultForms: [],
-    childForms: []
+    discount: false
   },
-  schema: {},
-  adultForms: [],
-  childForms: []
-};
+  schema: {
+    fields: {
+      // Basic registration fields
+      firstName: { type: "text", required: true },
+      lastName: { type: "text", required: true },
+      email: { type: "email", required: true },
+      contactNumber: { type: "text", required: true },
 
-const buildSchema = (formData: FormData) => {
-  const schema: Record<string, any> = {}
-
-  // Ticket information
-  if (formData.adultTickets > 0) {
-    schema.adultTickets = { type: "number", value: formData.adultTickets, price: 50 }
-  }
-  if (formData.childTickets > 0) {
-    schema.childTickets = { type: "number", value: formData.childTickets, price: 25 }
-  }
-
-  // Calculate total cost
-  const totalCost = formData.adultTickets * 50 + formData.childTickets * 25
-  schema.totalCost = { type: "number", value: totalCost }
-
-  if (formData.proceedToRegistration) {
-    // Always include basic fields
-    if (formData.acknowledgedIntro) schema.acknowledgedIntro = { type: "boolean", value: formData.acknowledgedIntro }
-    if (formData.salutation) schema.salutation = { type: "string", value: formData.salutation }
-    if (formData.firstName) schema.firstName = { type: "string", value: formData.firstName }
-    if (formData.lastName) schema.lastName = { type: "string", value: formData.lastName }
-    if (formData.email) schema.email = { type: "email", value: formData.email }
-
-    // Nationality logic
-    if (formData.nationality) {
-      schema.nationality = { type: "string", value: formData.nationality }
-      if (formData.nationality === "Others" && formData.otherNationality) {
-        schema.otherNationality = { type: "string", value: formData.otherNationality }
-      }
+      // Full registration fields
+      acknowledgedIntro: { type: "boolean", required: true },
+      salutation: { 
+        type: "radio", 
+        required: true,
+        options: ["Mr", "Mrs", "Ms", "Dr", "Prof"]
+      },
+      nationality: {
+        type: "radio",
+        required: true,
+        options: ["Singapore", "Others"]
+      },
+      isPermanentResident: { type: "boolean", required: false },
+      countryOfResidence: {
+        type: "radio",
+        required: true,
+        options: ["United States of America", "Others"]
+      },
+      occupation: {
+        type: "radio",
+        required: true,
+        options: ["Student", "Working Professional", "Business Owner and Entrepreneur", "Others"]
+      },
+      industry: {
+        type: "radio",
+        required: false,
+        options: [
+          "Aerospace & Defense",
+          "Arts, Entertainment and Hospitality",
+          "Banking and Finance",
+          "Built Environment",
+          "Consumer and Retail",
+          "Education",
+          "Energy and Natural Resources",
+          "Government and Non-profit",
+          "Healthcare",
+          "Information and Communication Technology",
+          "Life Sciences",
+          "Manufacturing",
+          "Professional Services",
+          "Real Estate",
+          "Social Services",
+          "Sports",
+          "Others"
+        ]
+      },
+      privacyConsent: { type: "boolean", required: true }
     }
-
-    // PR status (only if nationality is Others)
-    if (formData.nationality === "Others" && formData.isPermanentResident !== null) {
-      schema.isPermanentResident = { type: "boolean", value: formData.isPermanentResident }
-    }
-
-    // Country of residence
-    if (formData.countryOfResidence) {
-      schema.countryOfResidence = { type: "string", value: formData.countryOfResidence }
-      if (formData.countryOfResidence === "Others" && formData.otherCountryResidence) {
-        schema.otherCountryResidence = { type: "string", value: formData.otherCountryResidence }
-      }
-    }
-
-    // State and city (only if country is USA)
-    if (formData.countryOfResidence === "United States of America") {
-      if (formData.stateOfResidence) {
-        schema.stateOfResidence = { type: "string", value: formData.stateOfResidence }
-      }
-      if (formData.cityOfResidence) {
-        schema.cityOfResidence = { type: "string", value: formData.cityOfResidence }
-      }
-    }
-
-    // Occupation
-    if (formData.occupation) {
-      schema.occupation = { type: "string", value: formData.occupation }
-      if (formData.occupation === "Others" && formData.otherOccupation) {
-        schema.otherOccupation = { type: "string", value: formData.otherOccupation }
-      }
-    }
-
-    // Student-specific fields
-    if (formData.occupation === "Student") {
-      if (formData.school) {
-        schema.school = { type: "string", value: formData.school }
-      }
-      if (formData.qualification) {
-        schema.qualification = { type: "string", value: formData.qualification }
-        if (formData.qualification === "Others" && formData.otherQualification) {
-          schema.otherQualification = { type: "string", value: formData.otherQualification }
-        }
-      }
-      if (formData.courseOfStudy) {
-        schema.courseOfStudy = { type: "string", value: formData.courseOfStudy }
-        if (formData.courseOfStudy === "Others" && formData.otherCourseOfStudy) {
-          schema.otherCourseOfStudy = { type: "string", value: formData.otherCourseOfStudy }
-        }
-      }
-      if (formData.graduationYear) {
-        schema.graduationYear = { type: "string", value: formData.graduationYear }
-      }
-    }
-
-    // Professional-specific fields (only if occupation is Working Professional or Business Owner)
-    if (formData.occupation === "Working Professional" || formData.occupation === "Business Owner and Entrepreneur") {
-      if (formData.industry) {
-        schema.industry = { type: "string", value: formData.industry }
-        if (formData.industry === "Others" && formData.otherIndustry) {
-          schema.otherIndustry = { type: "string", value: formData.otherIndustry }
-        }
-      }
-
-      // Financial sector (only if industry is Banking and Finance)
-      if (formData.industry === "Banking and Finance" && formData.financialSector) {
-        schema.financialSector = { type: "string", value: formData.financialSector }
-      }
-
-      if (formData.jobFunction) {
-        schema.jobFunction = { type: "string", value: formData.jobFunction }
-        if (formData.jobFunction === "Others" && formData.otherJobFunction) {
-          schema.otherJobFunction = { type: "string", value: formData.otherJobFunction }
-        }
-      }
-    }
-  }
-
-  return schema
+  },
+  errors: {}
 }
 
 const formSlice = createSlice({
-  name: 'form',
+  name: "form",
   initialState,
   reducers: {
-    nextStep: (state) => {
-      state.currentStep += 1;
+    updateField: (
+      state,
+      action: PayloadAction<{ field: string; value: unknown }>
+    ) => {
+      const { field, value } = action.payload
+      state.formData = {
+        ...state.formData,
+        [field]: value
+      }
     },
-    prevStep: (state) => {
-      state.currentStep -= 1;
-    },    updateField: (state, action: PayloadAction<{ field: keyof FormData; value: any }>) => {
-      const { field, value } = action.payload;
-      (state.formData as any)[field] = value;
-      state.schema = buildSchema(state.formData);
+
+    updateFormData: (
+      state,
+      action: PayloadAction<Partial<FormData>>
+    ) => {
+      state.formData = {
+        ...state.formData,
+        ...action.payload
+      }
     },
-    updateSchema: (state) => {
-      state.schema = buildSchema(state.formData);
+
+    setError: (
+      state,
+      action: PayloadAction<{ field: string; message: string }>
+    ) => {
+      const { field, message } = action.payload
+      state.errors[field] = message
     },
+
+    clearError: (state, action: PayloadAction<string>) => {
+      const field = action.payload
+      delete state.errors[field]
+    },
+
+    clearErrors: (state) => {
+      state.errors = {}
+    },
+
     resetForm: (state) => {
-      state.formData = initialAdultForm;
-      state.currentStep = 1;
-      state.schema = {};
-      state.adultForms = [];
-      state.childForms = [];
+      state.formData = initialState.formData
+      state.errors = {}
     },
-    addAdultForm: (state) => {
-      state.adultForms.push({ ...initialAdultForm });
-    },
-    addChildForm: (state) => {
-      state.childForms.push({ ...initialChildForm });
-    },
-    removeAdultForm: (state, action: PayloadAction<number>) => {
-      state.adultForms.splice(action.payload, 1);
-    },
-    removeChildForm: (state, action: PayloadAction<number>) => {
-      state.childForms.splice(action.payload, 1);
+
+    updateSchema: (state, action: PayloadAction<FormSchema>) => {
+      state.schema = action.payload
     }
   }
-});
+})
 
-export const { updateField, updateSchema, resetForm, addAdultForm, addChildForm, removeAdultForm, removeChildForm } = formSlice.actions
+export const {
+  updateField,
+  updateFormData,
+  setError,
+  clearError,
+  clearErrors,
+  resetForm,
+  updateSchema
+} = formSlice.actions
+
 export default formSlice.reducer

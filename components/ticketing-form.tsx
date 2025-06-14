@@ -54,11 +54,11 @@ export default function TicketingForm({}: Props) {
   const childTickets = Number(formData.childTickets) || 0
 
   const handleFieldUpdate = (field: keyof FormData, value: unknown) => {
-  dispatch(updateField({ 
-    field: `${currentPersonIndex}.${field}`, 
-    value 
-  }))
-}
+    dispatch(updateField({ 
+      field: `${currentPersonIndex}.${field}`, 
+      value 
+    }))
+  }
 
   const handleSingleFieldUpdate = (field: keyof FormData, value: unknown) => {
     dispatch(updateField({ field, value }))
