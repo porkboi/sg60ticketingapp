@@ -1550,7 +1550,7 @@ export default function TicketingForm({}: Props) {
                 id="firstName"
                 value={formData[`${currentPersonIndex}.firstName`] || ''}
                 onChange={(e: ChangeEvent<HTMLInputElement>) => 
-                  handleFieldUpdate(`${currentPersonIndex}.firstName`, e.target.value)
+                  handleFieldUpdate(`firstName`, e.target.value)
                 }
                 placeholder="First Name"
               />
@@ -1558,7 +1558,7 @@ export default function TicketingForm({}: Props) {
                 id="lastName"
                 value={formData[`${currentPersonIndex}.lastName`] || ''}
                 onChange={(e: ChangeEvent<HTMLInputElement>) => 
-                  handleFieldUpdate(`${currentPersonIndex}.lastName`, e.target.value)
+                  handleFieldUpdate(`lastName`, e.target.value)
                 }
                 placeholder="Last Name"
               />
@@ -1566,7 +1566,7 @@ export default function TicketingForm({}: Props) {
                 id="email"
                 value={formData[`${currentPersonIndex}.email`] || ''}
                 onChange={(e: ChangeEvent<HTMLInputElement>) => 
-                  handleFieldUpdate(`${currentPersonIndex}.email`, e.target.value)
+                  handleFieldUpdate(`email`, e.target.value)
                 }
                 placeholder="Email Address"
               />
@@ -1574,7 +1574,7 @@ export default function TicketingForm({}: Props) {
                 id="contactNumber"
                 value={formData[`${currentPersonIndex}.contactNumber`] || ''}
                 onChange={(e: ChangeEvent<HTMLInputElement>) => 
-                  handleFieldUpdate(`${currentPersonIndex}.contactNumber`, e.target.value)
+                  handleFieldUpdate(`contactNumber`, e.target.value)
                 }
                 placeholder="Contact Number"
               />
