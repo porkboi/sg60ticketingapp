@@ -1330,7 +1330,7 @@ export default function TicketingForm({}: Props) {
       <CardHeader>
         <CardTitle>Registrant Information</CardTitle>
       </CardHeader>
-      <CardContent className="space-y-4">
+      <CardContent>
         {shouldShowStep(currentPersonIndex, "intro") && (
           <div className="mb-6">
             <Input
@@ -1574,14 +1574,6 @@ export default function TicketingForm({}: Props) {
         <div className="my-8">
           {renderBubbles()}
           {renderConsolidatedForm()}
-          {isFormComplete(currentPersonIndex) && currentPersonIndex < (adultTickets + childTickets - 1) && (
-                <Button 
-                  className="w-full bg-blue-600 hover:bg-blue-700 mt-4"
-                  onClick={() => setCurrentPersonIndex(currentPersonIndex + 1)}
-                >
-                  Next Person
-                </Button>
-              )}
         </div>
       )}
 
