@@ -1366,63 +1366,61 @@ export default function TicketingForm({}: Props) {
               placeholder="Contact Number"
             />
           </div>
-        )
-      }
-      {formData[`${currentPersonIndex}.contactNumber`] && (
-        <div className="mt-8">
-          <Card className="border-green-200 bg-gradient-to-r from-green-50 to-emerald-50 animate-in slide-in-from-bottom-4">
-            <CardHeader>
-              <div className="flex items-center gap-2">
-                <CheckCircle className="w-5 h-5 text-green-500" />
-                <CardTitle className="text-green-800">
-                  {currentPersonIndex === adultTickets + childTickets - 1 
-                    ? "All Registrations Complete!" 
-                    : "Section Complete!"}
-                </CardTitle>
-              </div>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              {currentPersonIndex === adultTickets + childTickets - 1 ? (
-                <>
-                  <p className="text-green-700">
-                    Thank you for completing all registrations! Please review your submission below.
-                  </p>
-                  <div className="bg-white p-4 rounded-lg border border-green-200">
-                    <h3 className="font-semibold mb-2 text-green-800">Registration Data:</h3>
-                    <pre className="text-xs text-left overflow-auto bg-gray-50 p-2 rounded text-gray-700">
-                      {JSON.stringify(formData, null, 2)}
-                    </pre>
-                  </div>
-                  <div className="flex gap-2">
-                    <Button className="flex-1 bg-green-600 hover:bg-green-700">
-                      Submit All Registrations
-                    </Button>
-                    <Button
-                      className="border-green-300 text-green-700 hover:bg-green-50"
-                      onClick={() => dispatch(resetForm())}
-                    >
-                      Start Over
-                    </Button>
-                  </div>
-                </>
-              ) : (
-                <div className="space-y-4">
-                  <p className="text-green-700">
-                    Great! You've completed this section. Ready to move on to the next person?
-                  </p>
-                  <Button 
-                    className="w-full bg-blue-600 hover:bg-blue-700"
-                    onClick={() => setCurrentPersonIndex(currentPersonIndex + 1)}
-                  >
-                    Next Person
-                  </Button>
+        )}
+        {formData[`${currentPersonIndex}.contactNumber`] !== "" && (
+          <div className="mt-8">
+            <Card className="border-green-200 bg-gradient-to-r from-green-50 to-emerald-50 animate-in slide-in-from-bottom-4">
+              <CardHeader>
+                <div className="flex items-center gap-2">
+                  <CheckCircle className="w-5 h-5 text-green-500" />
+                  <CardTitle className="text-green-800">
+                    {currentPersonIndex === adultTickets + childTickets - 1 
+                      ? "All Registrations Complete!" 
+                      : "Section Complete!"}
+                  </CardTitle>
                 </div>
-              )}
-            </CardContent>
-          </Card>
-        </div>
-      )
-    }
+              </CardHeader>
+              <CardContent className="space-y-4">
+                {currentPersonIndex === adultTickets + childTickets - 1 ? (
+                  <>
+                    <p className="text-green-700">
+                      Thank you for completing all registrations! Please review your submission below.
+                    </p>
+                    <div className="bg-white p-4 rounded-lg border border-green-200">
+                      <h3 className="font-semibold mb-2 text-green-800">Registration Data:</h3>
+                      <pre className="text-xs text-left overflow-auto bg-gray-50 p-2 rounded text-gray-700">
+                        {JSON.stringify(formData, null, 2)}
+                      </pre>
+                    </div>
+                    <div className="flex gap-2">
+                      <Button className="flex-1 bg-green-600 hover:bg-green-700">
+                        Submit All Registrations
+                      </Button>
+                      <Button
+                        className="border-green-300 text-green-700 hover:bg-green-50"
+                        onClick={() => dispatch(resetForm())}
+                      >
+                        Start Over
+                      </Button>
+                    </div>
+                  </>
+                ) : (
+                  <div className="space-y-4">
+                    <p className="text-green-700">
+                      Great! You've completed this section. Ready to move on to the next person?
+                    </p>
+                    <Button 
+                      className="w-full bg-blue-600 hover:bg-blue-700"
+                      onClick={() => setCurrentPersonIndex(currentPersonIndex + 1)}
+                    >
+                      Next Person
+                    </Button>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          </div>
+        )}
     </CardContent>
   </Card>
   )
