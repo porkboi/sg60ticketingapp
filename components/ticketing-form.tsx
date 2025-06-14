@@ -1548,32 +1548,47 @@ export default function TicketingForm({}: Props) {
             <CardContent className="space-y-4">
               <Input
                 id="firstName"
-                value={formData[`${currentPersonIndex}.firstName`]}
-                onChange={(e: ChangeEvent<HTMLInputElement>) => handleFieldUpdate("firstName", e.target.value)}
+                value={formData[`${currentPersonIndex}.firstName`] || ''}
+                onChange={(e: ChangeEvent<HTMLInputElement>) => 
+                  handleFieldUpdate(`${currentPersonIndex}.firstName`, e.target.value)
+                }
                 placeholder="First Name"
               />
               <Input
                 id="lastName"
-                value={formData[`${currentPersonIndex}.lastName`]}
-                onChange={(e: ChangeEvent<HTMLInputElement>) => handleFieldUpdate("lastName", e.target.value)}
+                value={formData[`${currentPersonIndex}.lastName`] || ''}
+                onChange={(e: ChangeEvent<HTMLInputElement>) => 
+                  handleFieldUpdate(`${currentPersonIndex}.lastName`, e.target.value)
+                }
                 placeholder="Last Name"
               />
               <Input
                 id="email"
-                value={formData[`${currentPersonIndex}.email`]}
-                onChange={(e: ChangeEvent<HTMLInputElement>) => handleFieldUpdate("email", e.target.value)}
+                value={formData[`${currentPersonIndex}.email`] || ''}
+                onChange={(e: ChangeEvent<HTMLInputElement>) => 
+                  handleFieldUpdate(`${currentPersonIndex}.email`, e.target.value)
+                }
                 placeholder="Email Address"
               />
               <Input
                 id="contactNumber"
-                value={formData[`${currentPersonIndex}.contactNumber`]}
-                onChange={(e: ChangeEvent<HTMLInputElement>) => handleFieldUpdate("contactNumber", e.target.value)}
+                value={formData[`${currentPersonIndex}.contactNumber`] || ''}
+                onChange={(e: ChangeEvent<HTMLInputElement>) => 
+                  handleFieldUpdate(`${currentPersonIndex}.contactNumber`, e.target.value)
+                }
                 placeholder="Contact Number"
               />
-              {!formData.discount && formData[`${currentPersonIndex}.contactNumber`] !== "" && currentPersonIndex < (adultTickets + childTickets - 1) && (
+              {!formData.discount && 
+              formData[`${currentPersonIndex}.contactNumber`] && 
+              currentPersonIndex < (adultTickets + childTickets - 1) && (
                 <Button 
                   className="w-full bg-blue-600 hover:bg-blue-700 mt-4"
-                  onClick={() => setCurrentPersonIndex(currentPersonIndex + 1)}
+                  onClick={() => {
+                    // Use setTimeout to prevent state update during render
+                    setTimeout(() => {
+                      setCurrentPersonIndex(currentPersonIndex + 1)
+                    }, 0)
+                  }}
                 >
                   Next Person
                 </Button>
