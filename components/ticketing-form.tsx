@@ -1421,8 +1421,8 @@ export default function TicketingForm({}: Props) {
             </Card>
           </div>
         )}
-    </CardContent>
-  </Card>
+      </CardContent>
+    </Card>
   )
   
 
