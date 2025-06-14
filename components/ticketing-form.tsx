@@ -1342,7 +1342,10 @@ export default function TicketingForm({}: Props) {
             />
           </div>
         )}
-        {formData[`${currentPersonIndex}.contactNumber`] !== "" && (
+        {formData[`${currentPersonIndex}.contactNumber`] !== "" && 
+        formData[`${currentPersonIndex}.firstName`] !== "" &&
+        formData[`${currentPersonIndex}.lastName`] !== "" && 
+        formData[`${currentPersonIndex}.email`] !== "" && (
           <div className="mt-8">
             <Card className="border-green-200 bg-gradient-to-r from-green-50 to-emerald-50 animate-in slide-in-from-bottom-4">
               <CardHeader>
