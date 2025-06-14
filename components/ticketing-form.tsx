@@ -343,57 +343,6 @@ export default function TicketingForm({}: Props) {
     return true
   }
 
-  // Replace the completion section with this dialog
-  const renderCompletionDialog = () => (
-    <Dialog open={showCompletion} onOpenChange={setShowCompletion}>
-      <DialogContent className="max-w-3xl max-h-[80vh] overflow-auto">
-        <DialogHeader>
-          <DialogTitle>Registration Complete!</DialogTitle>
-        </DialogHeader>
-        <div className="space-y-4">
-          <p className="text-green-700">
-            Thank you for joining the Singapore Global Network! All registrations have been completed successfully.
-          </p>
-          <div className="space-y-4">
-            {completedRegistrations.map((registration) => (
-              <div 
-                key={registration.id} 
-                className="bg-white p-4 rounded-lg border border-gray-200"
-              >
-                <h3 className="font-semibold mb-2 text-gray-800">
-                  {registration.type === "adult" ? "Adult" : "Child"} Registration
-                </h3>
-                <pre className="text-xs text-left overflow-auto bg-gray-50 p-2 rounded text-gray-700">
-                  {JSON.stringify(registration.data, null, 2)}
-                </pre>
-              </div>
-            ))}
-          </div>
-          <div className="flex gap-2">
-            <Button 
-              className="flex-1 bg-green-600 hover:bg-green-700"
-              onClick={() => {
-                // Handle final submission
-              }}
-            >
-              Submit All Registrations
-            </Button>
-            <Button
-              className="border-green-300 text-green-700 hover:bg-green-50"
-              onClick={() => {
-                setShowCompletion(false)
-                dispatch(clearRegistrations())
-                dispatch(resetForm())
-              }}
-            >
-              Start Over
-            </Button>
-          </div>
-        </div>
-      </DialogContent>
-    </Dialog>
-  )
-
   // Update the form completion logic to show the dialog
   useEffect(() => {
     if (areAllFormsComplete()) {
@@ -1382,95 +1331,100 @@ export default function TicketingForm({}: Props) {
         <CardTitle>Registrant Information</CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
-        <Input
-          id="firstName"
-          value={formData[`${currentPersonIndex}.firstName`] || ''}
-          onChange={(e: ChangeEvent<HTMLInputElement>) => 
-            handleFieldUpdate(`firstName`, e.target.value)
-          }
-          placeholder="First Name"
-        />
-        <Input
-          id="lastName"
-          value={formData[`${currentPersonIndex}.lastName`] || ''}
-          onChange={(e: ChangeEvent<HTMLInputElement>) => 
-            handleFieldUpdate(`lastName`, e.target.value)
-          }
-          placeholder="Last Name"
-        />
-        <Input
-          id="email"
-          value={formData[`${currentPersonIndex}.email`] || ''}
-          onChange={(e: ChangeEvent<HTMLInputElement>) => 
-            handleFieldUpdate(`email`, e.target.value)
-          }
-          placeholder="Email Address"
-        />
-        <Input
-          id="contactNumber"
-          value={formData[`${currentPersonIndex}.contactNumber`] || ''}
-          onChange={(e: ChangeEvent<HTMLInputElement>) => 
-            handleFieldUpdate(`contactNumber`, e.target.value)
-          }
-          placeholder="Contact Number"
-        />
-        {formData[`${currentPersonIndex}.contactNumber`] && (
-          <div className="mt-8">
-            <Card className="border-green-200 bg-gradient-to-r from-green-50 to-emerald-50 animate-in slide-in-from-bottom-4">
-              <CardHeader>
-                <div className="flex items-center gap-2">
-                  <CheckCircle className="w-5 h-5 text-green-500" />
-                  <CardTitle className="text-green-800">
-                    {currentPersonIndex === adultTickets + childTickets - 1 
-                      ? "All Registrations Complete!" 
-                      : "Section Complete!"}
-                  </CardTitle>
-                </div>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                {currentPersonIndex === adultTickets + childTickets - 1 ? (
-                  <>
-                    <p className="text-green-700">
-                      Thank you for completing all registrations! Please review your submission below.
-                    </p>
-                    <div className="bg-white p-4 rounded-lg border border-green-200">
-                      <h3 className="font-semibold mb-2 text-green-800">Registration Data:</h3>
-                      <pre className="text-xs text-left overflow-auto bg-gray-50 p-2 rounded text-gray-700">
-                        {JSON.stringify(formData, null, 2)}
-                      </pre>
-                    </div>
-                    <div className="flex gap-2">
-                      <Button className="flex-1 bg-green-600 hover:bg-green-700">
-                        Submit All Registrations
-                      </Button>
-                      <Button
-                        className="border-green-300 text-green-700 hover:bg-green-50"
-                        onClick={() => dispatch(resetForm())}
-                      >
-                        Start Over
-                      </Button>
-                    </div>
-                  </>
-                ) : (
-                  <div className="space-y-4">
-                    <p className="text-green-700">
-                      Great! You've completed this section. Ready to move on to the next person?
-                    </p>
-                    <Button 
-                      className="w-full bg-blue-600 hover:bg-blue-700"
-                      onClick={() => setCurrentPersonIndex(currentPersonIndex + 1)}
-                    >
-                      Next Person
-                    </Button>
-                  </div>
-                )}
-              </CardContent>
-            </Card>
+        {shouldShowStep(currentPersonIndex, "intro") && (
+          <div className="mb-6">
+            <Input
+              id="firstName"
+              value={formData[`${currentPersonIndex}.firstName`] || ''}
+              onChange={(e: ChangeEvent<HTMLInputElement>) => 
+                handleFieldUpdate(`firstName`, e.target.value)
+              }
+              placeholder="First Name"
+            />
+            <Input
+              id="lastName"
+              value={formData[`${currentPersonIndex}.lastName`] || ''}
+              onChange={(e: ChangeEvent<HTMLInputElement>) => 
+                handleFieldUpdate(`lastName`, e.target.value)
+              }
+              placeholder="Last Name"
+            />
+            <Input
+              id="email"
+              value={formData[`${currentPersonIndex}.email`] || ''}
+              onChange={(e: ChangeEvent<HTMLInputElement>) => 
+                handleFieldUpdate(`email`, e.target.value)
+              }
+              placeholder="Email Address"
+            />
+            <Input
+              id="contactNumber"
+              value={formData[`${currentPersonIndex}.contactNumber`] || ''}
+              onChange={(e: ChangeEvent<HTMLInputElement>) => 
+                handleFieldUpdate(`contactNumber`, e.target.value)
+              }
+              placeholder="Contact Number"
+            />
           </div>
         )
       }
-      </CardContent>
-    </Card>
+      {formData[`${currentPersonIndex}.contactNumber`] && (
+        <div className="mt-8">
+          <Card className="border-green-200 bg-gradient-to-r from-green-50 to-emerald-50 animate-in slide-in-from-bottom-4">
+            <CardHeader>
+              <div className="flex items-center gap-2">
+                <CheckCircle className="w-5 h-5 text-green-500" />
+                <CardTitle className="text-green-800">
+                  {currentPersonIndex === adultTickets + childTickets - 1 
+                    ? "All Registrations Complete!" 
+                    : "Section Complete!"}
+                </CardTitle>
+              </div>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              {currentPersonIndex === adultTickets + childTickets - 1 ? (
+                <>
+                  <p className="text-green-700">
+                    Thank you for completing all registrations! Please review your submission below.
+                  </p>
+                  <div className="bg-white p-4 rounded-lg border border-green-200">
+                    <h3 className="font-semibold mb-2 text-green-800">Registration Data:</h3>
+                    <pre className="text-xs text-left overflow-auto bg-gray-50 p-2 rounded text-gray-700">
+                      {JSON.stringify(formData, null, 2)}
+                    </pre>
+                  </div>
+                  <div className="flex gap-2">
+                    <Button className="flex-1 bg-green-600 hover:bg-green-700">
+                      Submit All Registrations
+                    </Button>
+                    <Button
+                      className="border-green-300 text-green-700 hover:bg-green-50"
+                      onClick={() => dispatch(resetForm())}
+                    >
+                      Start Over
+                    </Button>
+                  </div>
+                </>
+              ) : (
+                <div className="space-y-4">
+                  <p className="text-green-700">
+                    Great! You've completed this section. Ready to move on to the next person?
+                  </p>
+                  <Button 
+                    className="w-full bg-blue-600 hover:bg-blue-700"
+                    onClick={() => setCurrentPersonIndex(currentPersonIndex + 1)}
+                  >
+                    Next Person
+                  </Button>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        </div>
+      )
+    }
+    </CardContent>
+  </Card>
   )
   
 
