@@ -1640,14 +1640,6 @@ export default function TicketingForm({}: Props) {
         <div className="my-8">
           {renderBubbles()}
           {renderSmallForm()}
-          {formData[`${currentPersonIndex}.contactNumber`] && currentPersonIndex < (adultTickets + childTickets - 1) && (
-            <Button 
-              className="w-full bg-blue-600 hover:bg-blue-700 mt-4"
-              onClick={() => setCurrentPersonIndex(currentPersonIndex + 1)}
-            >
-              Next Person
-            </Button>
-          )}
         </div>
       )}
     </div>
